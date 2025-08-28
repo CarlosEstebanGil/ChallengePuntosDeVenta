@@ -1,8 +1,8 @@
 package com.carlos.challenge.controller;
 
-import com.carlos.challenge.dto.CreatePuntoRequest;
-import com.carlos.challenge.dto.UpdatePuntoRequest;
-import com.carlos.challenge.model.PuntoVenta;
+import com.carlos.challenge.dto.CreatePointRequest;
+import com.carlos.challenge.dto.UpdatePointRequest;
+import com.carlos.challenge.model.PointOfSale;
 import com.carlos.challenge.service.PointCacheService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,24 +17,24 @@ import java.util.List;
 @RequestMapping("/api/pos")
 @Validated
 @RequiredArgsConstructor
-public class PuntoVentaController {
+public class PointOfSaleController {
 
     private final PointCacheService service;
 
     @GetMapping
-    public ResponseEntity<List<PuntoVenta>> list() {
+    public ResponseEntity<List<PointOfSale>> list() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<PuntoVenta> create(@RequestBody @Valid CreatePuntoRequest req) {
-        PuntoVenta created = service.create(req.id(), req.nombre());
+    public ResponseEntity<PointOfSale> create(@RequestBody @Valid CreatePointRequest req) {
+        PointOfSale created = service.create(req.id(), req.nombre());
         return ResponseEntity.created(URI.create("/api/pos/" + created.id())).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PuntoVenta> update(@PathVariable Integer id,
-                                             @RequestBody @Valid UpdatePuntoRequest req) {
+    public ResponseEntity<PointOfSale> update(@PathVariable Integer id,
+                                              @RequestBody @Valid UpdatePointRequest req) {
         return ResponseEntity.ok(service.update(id, req.nombre()));
     }
 
@@ -45,7 +45,7 @@ public class PuntoVentaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PuntoVenta> findById(@PathVariable Integer id) {
+    public ResponseEntity<PointOfSale> findById(@PathVariable Integer id) {
         return ResponseEntity.ok(service.findById(id));
     }
 

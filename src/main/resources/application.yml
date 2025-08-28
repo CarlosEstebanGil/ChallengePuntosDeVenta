@@ -5,6 +5,10 @@ spring:
   application:
     name: pv-challenge
 
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/pv_challenge_db
+
 management:
   endpoints:
     web:

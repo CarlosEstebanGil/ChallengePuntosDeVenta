@@ -1,10 +1,12 @@
-package com.carlos.challenge.service;
+package com.carlos.challenge.service.impl;
 
-import com.carlos.challenge.model.PuntoVenta;
+import com.carlos.challenge.model.PointOfSale;
+import com.carlos.challenge.service.PointCacheService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import static org.springframework.http.HttpStatus.*;
 
@@ -18,31 +20,27 @@ public class PointCacheServiceImpl implements PointCacheService {
     private final Map<Integer, String> points = new ConcurrentHashMap<>();
 
     @Override
-    public List<PuntoVenta> findAll() {
+    public List<PointOfSale> findAll() {
         return points.entrySet().stream()
-                .map(e -> new PuntoVenta(e.getKey(), e.getValue()))
+                .map(e -> new PointOfSale(e.getKey(), e.getValue()))
                 .sorted((a,b) -> a.id().compareTo(b.id()))
                 .toList();
     }
 
     @Override
-    public PuntoVenta create(Integer id, String nombre) {
+    public PointOfSale create(Integer id, String nombre) {
         String prev = points.putIfAbsent(id, nombre);
         if (prev != null) {
             throw new ResponseStatusException(CONFLICT, EL_PUNTO_CON_ID_D_YA_EXISTE.formatted(id));
         }
-        return new PuntoVenta(id, nombre);
+        return new PointOfSale(id, nombre);
     }
 
     @Override
-    public PuntoVenta update(Integer id, String nombre) {
-        String nuevo = points.compute(id, (k, v) -> {
-            if (v == null) {
-                throw new ResponseStatusException(NOT_FOUND, NO_EXISTE_EL_PUNTO_CON_ID_D.formatted(id));
-            }
-            return nombre;
-        });
-        return new PuntoVenta(id, nuevo);
+    public PointOfSale update(Integer id, String nombre) {
+        return Optional.ofNullable(points.computeIfPresent(id, (k, v) -> nombre))
+                .map(n -> new PointOfSale(id, n))
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, NO_EXISTE_EL_PUNTO_CON_ID_D.formatted(id)));
     }
 
     @Override
@@ -54,11 +52,11 @@ public class PointCacheServiceImpl implements PointCacheService {
     }
 
     @Override
-    public PuntoVenta findById(Integer id) {
+    public PointOfSale findById(Integer id) {
         String nombre = points.get(id);
         if (nombre == null) {
             throw new ResponseStatusException(NOT_FOUND, NO_EXISTE_EL_PUNTO_CON_ID_D.formatted(id));
         }
-        return new PuntoVenta(id, nombre);
+        return new PointOfSale(id, nombre);
     }
 }
