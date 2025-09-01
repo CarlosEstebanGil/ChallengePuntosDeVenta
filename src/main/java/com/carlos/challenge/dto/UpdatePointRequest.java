@@ -3,5 +3,5 @@ package com.carlos.challenge.dto;
 import jakarta.validation.constraints.NotBlank;
 
 public record UpdatePointRequest(
-        @NotBlank String nombre
+        @NotBlank String name
 ) {}

@@ -18,19 +18,18 @@ import java.util.List;
 public class QuickBootstrap implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(QuickBootstrap.class);
-    public static final String CARGANDO_DATOS_POR_AHORA_HARDCODEADOS_DE_PV_Y_GRAFO_QUICK_BOOTSTRAP = "==> Cargando datos, por ahora hardcodeados, de PV y Grafo (quick bootstrap)";
-    public static final String NO_SE_PUDO_CREAR_ARISTA_COSTO = "No se pudo crear arista {}-{} (costo {}): {}";
-    public static final String QUICK_BOOTSTRAP_PVS_Y_ARISTAS_INICIALES_CARGADAS = "<== Quick bootstrap: {} PVs y {} aristas iniciales cargadas";
+    public static final String LOADING_HARDCODED_PVS_AND_GRAPH = "==> Loading hardcoded Points of Sale and Graph (quick bootstrap)";
+    public static final String FAILED_TO_CREATE_EDGE_COST = "Failed to create edge {}-{} (cost {}): {}";
+    public static final String QUICK_BOOTSTRAP_PVS_AND_EDGES_LOADED = "<== Quick bootstrap: {} Points of Sale and {} initial edges loaded";
 
-    private final PointCacheService pointService;
+    private final PointCacheService pointCacheService;
     private final GraphService graphService;
 
     @Override
     public void run(ApplicationArguments args) {
-        log.info(CARGANDO_DATOS_POR_AHORA_HARDCODEADOS_DE_PV_Y_GRAFO_QUICK_BOOTSTRAP);
+        log.info(LOADING_HARDCODED_PVS_AND_GRAPH);
 
-        // 1) Puntos de Venta (challenge)
-        List<PointOfSale> puntos = List.of(
+        List<PointOfSale> pointsOfSale = List.of(
                 new PointOfSale(1, "CABA"),
                 new PointOfSale(2, "GBA_1"),
                 new PointOfSale(3, "GBA_2"),
@@ -43,18 +42,16 @@ public class QuickBootstrap implements ApplicationRunner {
                 new PointOfSale(10, "Catamarca")
         );
 
-        for (PointOfSale pv : puntos) {
+        for (PointOfSale pos : pointsOfSale) {
             try {
-                pointService.create(pv.id(), pv.nombre());
+                pointCacheService.create(pos.id(), pos.name());
             } catch (Exception e) {
                 try {
-                    pointService.update(pv.id(), pv.nombre());
+                    pointCacheService.update(pos.id(), pos.name());
                 } catch (Exception ignore) {
                 }
             }
         }
-
-        // 2) Grafo (challenge) — aristas bidireccionales con costo
 
         int[][] edges = new int[][]{
                 {1,2,2},
@@ -73,15 +70,15 @@ public class QuickBootstrap implements ApplicationRunner {
                 {4,6,6}
         };
 
-        for (int[] e : edges) {
+        for (int[] edge : edges) {
             try {
-                graphService.upsertEdge(e[0], e[1], e[2]);
+                graphService.upsertEdge(edge[0], edge[1], edge[2]);
             } catch (Exception ex) {
-                log.warn(NO_SE_PUDO_CREAR_ARISTA_COSTO, e[0], e[1], e[2], ex.getMessage());
+                log.warn(FAILED_TO_CREATE_EDGE_COST, edge[0], edge[1], edge[2], ex.getMessage());
             }
         }
 
-        log.info(QUICK_BOOTSTRAP_PVS_Y_ARISTAS_INICIALES_CARGADAS,
-                puntos.size(), edges.length);
+        log.info(QUICK_BOOTSTRAP_PVS_AND_EDGES_LOADED,
+                pointsOfSale.size(), edges.length);
     }
 }

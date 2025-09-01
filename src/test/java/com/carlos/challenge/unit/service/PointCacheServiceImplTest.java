@@ -31,9 +31,9 @@ class PointCacheServiceImplTest {
     void create_ok_y_luego_findById() {
         PointOfSale pv = service.create(1, "Sucursal Centro");
         assertThat(pv.id()).isEqualTo(1);
-        assertThat(pv.nombre()).isEqualTo("Sucursal Centro");
+        assertThat(pv.name()).isEqualTo("Sucursal Centro");
 
-        assertThat(service.findById(1).nombre()).isEqualTo("Sucursal Centro");
+        assertThat(service.findById(1).name()).isEqualTo("Sucursal Centro");
     }
 
     @Test
@@ -48,8 +48,8 @@ class PointCacheServiceImplTest {
     void update_ok() {
         service.create(2, "Viejo");
         PointOfSale updated = service.update(2, "Nuevo");
-        assertThat(updated.nombre()).isEqualTo("Nuevo");
-        assertThat(service.findById(2).nombre()).isEqualTo("Nuevo");
+        assertThat(updated.name()).isEqualTo("Nuevo");
+        assertThat(service.findById(2).name()).isEqualTo("Nuevo");
     }
 
     @Test

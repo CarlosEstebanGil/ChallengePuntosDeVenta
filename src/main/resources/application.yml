@@ -14,3 +14,12 @@ management:
     web:
       exposure:
         include: health,info
+
+security:
+  users:
+    - username: admin
+      password: admin
+      roles: ADMIN
+    - username: user
+      password: user
+      roles: USER

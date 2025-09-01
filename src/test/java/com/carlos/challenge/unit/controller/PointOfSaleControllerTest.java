@@ -56,7 +56,7 @@ class PointOfSaleControllerTest {
 
     @Test
     @WithMockUser(username = "user", roles = {"USER"})
-    void listar_ok() throws Exception {
+    void list_ok() throws Exception {
         when(pointCache.findAll()).thenReturn(List.of(
                 new PointOfSale(1, "Sucursal Centro"),
                 new PointOfSale(2, "Sucursal Norte")
@@ -66,11 +66,11 @@ class PointOfSaleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].nombre").value("Sucursal Centro"));
+                .andExpect(jsonPath("$[0].name").value("Sucursal Centro"));
     }
 
     @Test
-    void listar_sin_auth_401() throws Exception {
+    void list_sin_auth_401() throws Exception {
         mvc.perform(get("/api/pos"))
                 .andExpect(status().isUnauthorized());
     }
@@ -83,14 +83,14 @@ class PointOfSaleControllerTest {
         mvc.perform(get("/api/pos/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.nombre").value("Sucursal Centro"));
+                .andExpect(jsonPath("$.name").value("Sucursal Centro"));
     }
 
     @Test
     @WithMockUser(roles = {"USER"})
     void findById_404() throws Exception {
         when(pointCache.findById(anyInt()))
-                .thenThrow(new ResponseStatusException(NOT_FOUND, "No existe"));
+                .thenThrow(new ResponseStatusException(NOT_FOUND, "Not found"));
 
         mvc.perform(get("/api/pos/999"))
                 .andExpect(status().isNotFound());
@@ -98,41 +98,41 @@ class PointOfSaleControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void crear_ok() throws Exception {
+    void create_ok() throws Exception {
         when(pointCache.create(1, "Sucursal Centro"))
                 .thenReturn(new PointOfSale(1, "Sucursal Centro"));
 
         mvc.perform(post("/api/pos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"id":1,"nombre":"Sucursal Centro"}
+                                {"id":1,"name":"Sucursal Centro"}
                                 """))
                 .andExpect(status().isCreated())        // o isOk() según tu controller
                 .andExpect(header().string("Location", "/api/pos/1"))
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.nombre").value("Sucursal Centro"));
+                .andExpect(jsonPath("$.name").value("Sucursal Centro"));
     }
 
     @Test
     @WithMockUser(username = "user", roles = {"USER"})
-    void crear_con_user_403() throws Exception {
+    void create_con_user_403() throws Exception {
 
         mvc.perform(post("/api/pos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                             {"id":2,"nombre":"PV2"}
+                             {"id":2,"name":"PV2"}
                          """))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void crear_400_validacion() throws Exception {
+    void create_400_validacion() throws Exception {
 
         mvc.perform(post("/api/pos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-            {"id":null,"nombre":""}
+            {"id":null,"name":""}
             """))
                 .andExpect(status().isBadRequest());
     }
@@ -140,16 +140,16 @@ class PointOfSaleControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void update_ok() throws Exception {
-        when(pointCache.update(1, "Nuevo Nombre"))
-                .thenReturn(new PointOfSale(1, "Nuevo Nombre"));
+        when(pointCache.update(1, "Nuevo name"))
+                .thenReturn(new PointOfSale(1, "Nuevo name"));
 
         mvc.perform(put("/api/pos/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nombre":"Nuevo Nombre"}"""))
+                                {"name":"Nuevo name"}"""))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.nombre").value("Nuevo Nombre"));
+                .andExpect(jsonPath("$.name").value("Nuevo name"));
     }
 
     @Test
@@ -158,7 +158,7 @@ class PointOfSaleControllerTest {
         mvc.perform(put("/api/pos/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nombre":"X"}"""))
+                                {"name":"X"}"""))
                 .andExpect(status().isForbidden());
     }
 
@@ -166,12 +166,12 @@ class PointOfSaleControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void update_404() throws Exception {
         when(pointCache.update(anyInt(), any()))
-                .thenThrow(new ResponseStatusException(NOT_FOUND, "No existe"));
+                .thenThrow(new ResponseStatusException(NOT_FOUND, "Not found"));
 
         mvc.perform(put("/api/pos/999")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nombre":"Pepito"}"""))
+                                {"name":"Pepito"}"""))
                 .andExpect(status().isNotFound());
     }
 
@@ -194,7 +194,7 @@ class PointOfSaleControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void delete_404() throws Exception {
-        doThrow(new ResponseStatusException(NOT_FOUND, "No existe"))
+        doThrow(new ResponseStatusException(NOT_FOUND, "Not found"))
                 .when(pointCache).delete(999);
 
         mvc.perform(delete("/api/pos/999"))

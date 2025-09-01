@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface GraphService {
 
-    void upsertEdge(int fromId, int toId, int costo);
+    void upsertEdge(int fromId, int toId, int cost);
 
     void removeEdge(int fromId, int toId);
 

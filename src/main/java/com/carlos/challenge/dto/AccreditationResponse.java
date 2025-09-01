@@ -5,8 +5,8 @@ import java.time.Instant;
 
 public record AccreditationResponse(
         String id,
-        BigDecimal importe,
-        Integer idPuntoVenta,
-        String nombrePuntoVenta,
-        Instant fechaRecepcion
+        BigDecimal amount,
+        Integer pointOfSaleId,
+        String pointOfSaleName,
+        Instant receptionDate
 ) {}

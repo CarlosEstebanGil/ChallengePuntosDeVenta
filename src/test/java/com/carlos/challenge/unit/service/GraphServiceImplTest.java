@@ -51,14 +51,14 @@ class GraphServiceImplTest {
 
         List<NeighborResponse> ns = graph.neighborsOf(1);
         assertThat(ns).extracting(NeighborResponse::id).containsExactly(2,3);
-        assertThat(ns.get(0).costo()).isEqualTo(5);
-        assertThat(ns.get(1).costo()).isEqualTo(9);
+        assertThat(ns.get(0).cost()).isEqualTo(5);
+        assertThat(ns.get(1).cost()).isEqualTo(9);
 
         assertThat(graph.neighborsOf(2)).extracting(NeighborResponse::id).contains(1);
     }
 
     @Test
-    void upsertEdge_valida_reflexiva_y_costos_negativos() {
+    void upsertEdge_valida_reflexiva_y_costs_negativos() {
         assertThatThrownBy(() -> graph.upsertEdge(1, 1, 5))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("reflexiva");
@@ -84,7 +84,7 @@ class GraphServiceImplTest {
     }
 
     @Test
-    void shortestPath_devuelve_camino_minimo_y_costo() {
+    void shortestPath_devuelve_camino_minimo_y_cost() {
         graph.upsertEdge(1, 2, 5);
         graph.upsertEdge(1, 3, 9);
         graph.upsertEdge(2, 3, 3);
@@ -92,16 +92,16 @@ class GraphServiceImplTest {
         graph.upsertEdge(3, 4, 2);
 
         MinPathResponse r = graph.shortestPath(1, 4);
-        assertThat(r.costoTotal()).isEqualTo(10);
-        assertThat(r.rutaIds()).containsExactly(1,2,3,4);
-        assertThat(r.rutaNombres()).containsExactly("PV 1","PV 2","PV 3","PV 4");
+        assertThat(r.totalCost()).isEqualTo(10);
+        assertThat(r.routeIds()).containsExactly(1,2,3,4);
+        assertThat(r.routeNames()).containsExactly("PV 1","PV 2","PV 3","PV 4");
     }
 
     @Test
     void shortestPath_mismo_nodo() {
         MinPathResponse r = graph.shortestPath(5, 5);
-        assertThat(r.costoTotal()).isEqualTo(0);
-        assertThat(r.rutaIds()).containsExactly(5);
+        assertThat(r.totalCost()).isEqualTo(0);
+        assertThat(r.routeIds()).containsExactly(5);
     }
 
     @Test

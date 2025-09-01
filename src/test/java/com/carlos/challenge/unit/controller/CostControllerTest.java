@@ -66,7 +66,7 @@ class CostControllerTest {
                         {
                           "fromId": 1,
                           "toId":   2,
-                          "costo":  5
+                          "cost":  5
                         }
                         """))
                 .andExpect(status().isNoContent());
@@ -81,7 +81,7 @@ class CostControllerTest {
                         {
                           "fromId": 1,
                           "toId":   2,
-                          "costo":  5
+                          "cost":  5
                         }
                         """))
                 .andExpect(status().isForbidden());
@@ -97,7 +97,7 @@ class CostControllerTest {
                         {
                           "fromId": null,
                           "toId":   null,
-                          "costo":  -1
+                          "cost":  -1
                         }
                         """))
                 .andExpect(status().isBadRequest());
@@ -114,7 +114,7 @@ class CostControllerTest {
                         {
                           "fromId": 1,
                           "toId":   2,
-                          "costo":  0
+                          "cost":  0
                         }
                         """))
                 .andExpect(status().isNoContent());
@@ -129,7 +129,7 @@ class CostControllerTest {
                         {
                           "fromId": 1,
                           "toId":   2,
-                          "costo":  0
+                          "cost":  0
                         }
                         """))
                 .andExpect(status().isForbidden());
@@ -146,8 +146,8 @@ class CostControllerTest {
         mvc.perform(get("/api/costs/neighbors/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(2))
-                .andExpect(jsonPath("$[0].nombre").value("Sucursal Norte"))
-                .andExpect(jsonPath("$[0].costo").value(5));
+                .andExpect(jsonPath("$[0].name").value("Sucursal Norte"))
+                .andExpect(jsonPath("$[0].cost").value(5));
     }
 
     @Test
@@ -155,7 +155,6 @@ class CostControllerTest {
     void neighbors_404_si_pv_inexistente() throws Exception {
         when(graph.neighborsOf(anyInt()))
                 .thenThrow(new ResponseStatusException(NOT_FOUND, "No existe el punto"));
-
         mvc.perform(get("/api/costs/neighbors/999"))
                 .andExpect(status().isNotFound());
     }
@@ -165,7 +164,6 @@ class CostControllerTest {
         mvc.perform(get("/api/costs/neighbors/1"))
                 .andExpect(status().isUnauthorized());
     }
-
 
     @Test
     @WithMockUser(roles = {"USER"})
@@ -179,17 +177,16 @@ class CostControllerTest {
 
         mvc.perform(get("/api/costs/min-path?from=1&to=4"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.costoTotal").value(12))
-                .andExpect(jsonPath("$.rutaIds[0]").value(1))
-                .andExpect(jsonPath("$.rutaNombres[2]").value("Sucursal Sur"));
+                .andExpect(jsonPath("$.totalCost").value(12))
+                .andExpect(jsonPath("$.routeIds[0]").value(1))
+                .andExpect(jsonPath("$.routeNames[2]").value("Sucursal Sur"));
     }
 
     @Test
     @WithMockUser(roles = {"USER"})
     void minPath_404_si_no_hay_camino() throws Exception {
-        when(graph.shortestPath(1, 99))
-                .thenThrow(new ResponseStatusException(NOT_FOUND, "No existe camino"));
-
+        when(graph.neighborsOf(anyInt()))
+                .thenThrow(new ResponseStatusException(NOT_FOUND, "No existe el punto"));
         mvc.perform(get("/api/costs/min-path?from=1&to=99"))
                 .andExpect(status().isNotFound());
     }

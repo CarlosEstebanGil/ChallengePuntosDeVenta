@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -44,15 +44,15 @@ class AccreditationControllerTest {
             return http
                     .csrf(csrf -> csrf.disable())
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers(POST, "/api/acreditaciones").authenticated()
-                            .requestMatchers(GET,  "/api/acreditaciones/**").authenticated()
+                            .requestMatchers(POST, "/api/accreditations").authenticated()
+                            .requestMatchers(GET,  "/api/accreditations/**").authenticated()
+                            .requestMatchers(DELETE, "/api/accreditations/**").authenticated()
                             .anyRequest().denyAll()
                     )
                     .httpBasic(b -> {})
                     .build();
         }
     }
-
     @Autowired MockMvc mvc;
 
     @MockitoBean AccreditationService service;
@@ -65,22 +65,22 @@ class AccreditationControllerTest {
         );
         when(service.create(any())).thenReturn(dto);
 
-        mvc.perform(post("/api/acreditaciones")
+        mvc.perform(post("/api/accreditations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {"importe":1234.56,"idPuntoVenta":1}
+                        {"amount":1234.56,"pointOfSaleId":1}
                         """))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.idPuntoVenta").value(1))
-                .andExpect(jsonPath("$.nombrePuntoVenta").value("Sucursal Centro"));
+                .andExpect(jsonPath("$.pointOfSaleId").value(1))
+                .andExpect(jsonPath("$.pointOfSaleName").value("Sucursal Centro"));
     }
 
     @Test
     void create_unauth_401() throws Exception {
-        mvc.perform(post("/api/acreditaciones")
+        mvc.perform(post("/api/accreditations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {"importe":10,"idPuntoVenta":1}
+                        {"amount":10,"pointOfSaleId":1}
                         """))
                 .andExpect(status().isUnauthorized());
     }
@@ -88,10 +88,10 @@ class AccreditationControllerTest {
     @Test
     @WithMockUser(roles = {"USER"})
     void create_400_validacion() throws Exception {
-        mvc.perform(post("/api/acreditaciones")
+        mvc.perform(post("/api/accreditations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {"importe":null,"idPuntoVenta":null}
+                        {"amount":null,"pointOfSaleId":null}
                         """))
                 .andExpect(status().isBadRequest());
     }
@@ -107,15 +107,15 @@ class AccreditationControllerTest {
         when(service.list(eq(Optional.empty()), eq(Optional.empty()), eq(Optional.empty()), any()))
                 .thenReturn(page);
 
-        mvc.perform(get("/api/acreditaciones?page=0&size=20"))
+        mvc.perform(get("/api/accreditations?page=0&size=20"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1))
-                .andExpect(jsonPath("$.content[0].idPuntoVenta").value(1));
+                .andExpect(jsonPath("$.content[0].pointOfSaleId").value(1));
     }
 
     @Test
     void list_sin_auth_401() throws Exception {
-        mvc.perform(get("/api/acreditaciones?page=0&size=5"))
+        mvc.perform(get("/api/accreditations?page=0&size=5"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -127,7 +127,7 @@ class AccreditationControllerTest {
         when(service.list(eq(Optional.of(1)), eq(Optional.empty()), eq(Optional.empty()), any()))
                 .thenReturn(page);
 
-        mvc.perform(get("/api/acreditaciones?idPuntoVenta=1&page=0&size=10"))
+        mvc.perform(get("/api/accreditations?pointOfSaleId=1&page=0&size=10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray());
     }
@@ -142,7 +142,7 @@ class AccreditationControllerTest {
         when(service.list(eq(Optional.empty()), eq(Optional.of(from)), eq(Optional.of(to)), any()))
                 .thenReturn(page);
 
-        mvc.perform(get("/api/acreditaciones?from=2025-08-26T00:00:00Z&to=2025-08-27T00:00:00Z&page=0&size=10"))
+        mvc.perform(get("/api/accreditations?from=2025-08-26T00:00:00Z&to=2025-08-27T00:00:00Z&page=0&size=10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray());
     }
@@ -155,8 +155,30 @@ class AccreditationControllerTest {
         when(service.list(any(), any(), any(), any()))
                 .thenReturn(emptyPage);
 
-        mvc.perform(get("/api/acreditaciones?page=9999&size=5"))
+        mvc.perform(get("/api/accreditations?page=9999&size=5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isEmpty());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    void delete_ok() throws Exception {
+        doNothing().when(service).delete("abc123");
+
+        mvc.perform(delete("/api/accreditations/{id}", "abc123"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @WithMockUser(roles = {"USER"})
+    void delete_forbidden_403() throws Exception {
+        mvc.perform(delete("/api/accreditations/{id}", "abc123"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void delete_unauth_401() throws Exception {
+        mvc.perform(delete("/api/accreditations/{id}", "abc123"))
+                .andExpect(status().isUnauthorized());
     }
 }

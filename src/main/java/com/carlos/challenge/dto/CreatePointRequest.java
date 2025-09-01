@@ -5,5 +5,5 @@ import jakarta.validation.constraints.NotNull;
 
 public record CreatePointRequest(
         @NotNull Integer id,
-        @NotBlank String nombre
+        @NotBlank String name
 ) {}

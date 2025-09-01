@@ -12,8 +12,12 @@ public interface AccreditationService {
 
     AccreditationResponse create(CreateAccreditationRequest req);
 
-    Page<AccreditationResponse> list(Optional<Integer> idPuntoVenta,
+    Page<AccreditationResponse> list(Optional<Integer> pointOfSaleId,
                                        Optional<Instant> from,
                                        Optional<Instant> to,
                                        Pageable pageable);
+
+    void delete(String id);
+
+    Optional<AccreditationResponse> findById(String id);
 }

@@ -6,6 +6,6 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public record CreateAccreditationRequest(
-        @NotNull @Positive BigDecimal importe,
-        @NotNull Integer idPuntoVenta
+        @NotNull @Positive BigDecimal amount,
+        @NotNull Integer pointOfSaleId
 ) {}

@@ -62,13 +62,13 @@ class AcreditacionIntegrationTest {
     }
 
     @Test
-    void flujo_completo_crear_y_listar_acreditaciones() {
+    void flujo_completo_create_y_list_acreditaciones() {
 
         Instant now = Instant.now();
         Instant from = now.minus(1, ChronoUnit.HOURS);
         Instant to   = now.plus(1, ChronoUnit.HOURS);
 
-        Map<String, Object> pv = Map.of("id", 1, "nombre", "Sucursal Centro");
+        Map<String, Object> pv = Map.of("id", 1, "name", "Sucursal Centro");
         ResponseEntity<Void> pvResp = rest
                 .withBasicAuth("admin", "admin")
                 .postForEntity(url("/api/pos"), pv, Void.class);
@@ -76,26 +76,26 @@ class AcreditacionIntegrationTest {
         assertThat(pvResp.getStatusCode().is2xxSuccessful()).isTrue();
 
         Map<String, Object> accReq = new HashMap<>();
-        accReq.put("importe", new BigDecimal("1234.56"));
-        accReq.put("idPuntoVenta", 1);
+        accReq.put("amount", new BigDecimal("1234.56"));
+        accReq.put("pointOfSaleId", 1);
 
         ResponseEntity<AccreditationResponse> accResp = rest
                 .withBasicAuth("user", "user")
-                .postForEntity(url("/api/acreditaciones"), accReq, AccreditationResponse.class);
+                .postForEntity(url("/api/accreditations"), accReq, AccreditationResponse.class);
 
         assertThat(accResp.getStatusCode()).isIn(HttpStatus.OK, HttpStatus.CREATED);
 
         AccreditationResponse creada = Objects.requireNonNull(
-                accResp.getBody(), "Body null al crear acreditación");
+                accResp.getBody(), "Body null al create acreditación");
         assertThat(creada.id()).isNotBlank();
-        assertThat(creada.idPuntoVenta()).isEqualTo(1);
-        assertThat(creada.nombrePuntoVenta()).isEqualTo("Sucursal Centro");
-        assertThat(creada.fechaRecepcion()).isNotNull();
+        assertThat(creada.pointOfSaleId()).isEqualTo(1);
+        assertThat(creada.pointOfSaleName()).isEqualTo("Sucursal Centro");
+        assertThat(creada.receptionDate()).isNotNull();
 
         ResponseEntity<PageResponse<AccreditationResponse>> pageAll = rest
                 .withBasicAuth("user", "user")
                 .exchange(
-                        url("/api/acreditaciones?page=0&size=10"),
+                        url("/api/accreditations?page=0&size=10"),
                         HttpMethod.GET,
                         null,
                         new ParameterizedTypeReference<>() {}
@@ -113,7 +113,7 @@ class AcreditacionIntegrationTest {
         ResponseEntity<PageResponse<AccreditationResponse>> pageByPv = rest
                 .withBasicAuth("user", "user")
                 .exchange(
-                        url("/api/acreditaciones?idPuntoVenta=1&page=0&size=10"),
+                        url("/api/accreditations?pointOfSaleId=1&page=0&size=10"),
                         HttpMethod.GET,
                         null,
                         new ParameterizedTypeReference<>() {}
@@ -124,14 +124,14 @@ class AcreditacionIntegrationTest {
                 pageByPv.getBody(), "Body null en filtro por PV");
         assertThat(bodyByPv.content).isNotEmpty();
 
-        assertThat(bodyByPv.content).allSatisfy(r -> assertThat(r.idPuntoVenta()).isEqualTo(1));
+        assertThat(bodyByPv.content).allSatisfy(r -> assertThat(r.pointOfSaleId()).isEqualTo(1));
 
 
         String qs = String.format("?from=%s&to=%s&page=0&size=10", from, to);
         ResponseEntity<PageResponse<AccreditationResponse>> pageByDate = rest
                 .withBasicAuth("user", "user")
                 .exchange(
-                        url("/api/acreditaciones" + qs),
+                        url("/api/accreditations" + qs),
                         HttpMethod.GET,
                         null,
                         new ParameterizedTypeReference<>() {}
@@ -148,21 +148,21 @@ class AcreditacionIntegrationTest {
 
 
         ResponseEntity<String> unauth = rest
-                .getForEntity(url("/api/acreditaciones?page=0&size=5"), String.class);
+                .getForEntity(url("/api/accreditations?page=0&size=5"), String.class);
         assertThat(unauth.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
     void paginado_devuelve_vacio_fuera_de_rango() {
 
-        Map<String, Object> pv = Map.of("id", 99, "nombre", "PV Test");
+        Map<String, Object> pv = Map.of("id", 99, "name", "PV Test");
         rest.withBasicAuth("admin", "admin")
                 .postForEntity(url("/api/pos"), pv, Void.class);
 
         ResponseEntity<PageResponse<AccreditationResponse>> page = rest
                 .withBasicAuth("user", "user")
                 .exchange(
-                        url("/api/acreditaciones?page=9999&size=5"),
+                        url("/api/accreditations?page=9999&size=5"),
                         HttpMethod.GET,
                         null,
                         new ParameterizedTypeReference<>() {}
@@ -173,5 +173,38 @@ class AcreditacionIntegrationTest {
                 page.getBody(), "Body null en página fuera de rango");
         assertThat(body.content).isEmpty();
         assertThat(body.empty).isTrue();
+    }
+
+    @Test
+    void delete_accreditation_ok() {
+        // Create POS
+        Map<String, Object> pv = Map.of("id", 2, "name", "Sucursal Norte");
+        rest.withBasicAuth("admin", "admin")
+                .postForEntity(url("/api/pos"), pv, Void.class);
+
+        // Create accreditation
+        Map<String, Object> accReq = new HashMap<>();
+        accReq.put("amount", new BigDecimal("100.00"));
+        accReq.put("pointOfSaleId", 2);
+
+        ResponseEntity<AccreditationResponse> accResp = rest
+                .withBasicAuth("user", "user")
+                .postForEntity(url("/api/accreditations"), accReq, AccreditationResponse.class);
+
+        String id = Objects.requireNonNull(accResp.getBody()).id();
+
+        // Delete accreditation
+        ResponseEntity<Void> delResp = rest
+                .withBasicAuth("admin", "admin")
+                .exchange(url("/api/accreditations/" + id), HttpMethod.DELETE, null, Void.class);
+
+        assertThat(delResp.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        // Optionally, verify it's gone (e.g., not in list)
+        ResponseEntity<String> getResp = rest
+                .withBasicAuth("user", "user")
+                .getForEntity(url("/api/accreditations/" + id), String.class);
+
+        assertThat(getResp.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }

@@ -41,7 +41,7 @@ class QuickBootstrapTest {
             Map.entry(10, "Catamarca")
     );
 
-    // edges: {from,to,costo}
+    // edges: {from,to,cost}
     final int[][] expectedEdges = new int[][]{
             {1,2,2},
             {1,3,3},

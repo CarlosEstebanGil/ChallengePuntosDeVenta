@@ -13,7 +13,7 @@ import java.time.Instant;
 
 @Document(collection = "acreditacionesV2")
 @CompoundIndexes({
-        @CompoundIndex(name = "pv_fecha_idx", def = "{'idPuntoVenta': 1, 'fechaRecepcion': -1}")
+        @CompoundIndex(name = "pv_fecha_idx", def = "{'pointOfSaleId': 1, 'receptionDate': -1}")
 })
 @Getter
 @Setter
@@ -22,22 +22,21 @@ public class Accreditation {
     @Id
     private String id;
 
-    private BigDecimal importe;
+    private BigDecimal amount;
 
     @Indexed
-    private Integer idPuntoVenta;
+    private Integer pointOfSaleId;
 
     @Indexed
-    private Instant fechaRecepcion;       // lo seteo en el servicio
-
-    private String nombrePuntoVenta;      // lo obtengo del caché
+    private Instant receptionDate;
+    private String pointOfSaleName;
 
     public Accreditation() {}
 
-    public Accreditation(BigDecimal importe, Integer idPuntoVenta, Instant fechaRecepcion, String nombrePuntoVenta) {
-        this.importe = importe;
-        this.idPuntoVenta = idPuntoVenta;
-        this.fechaRecepcion = fechaRecepcion;
-        this.nombrePuntoVenta = nombrePuntoVenta;
+    public Accreditation(BigDecimal amount, Integer pointOfSaleId, Instant receptionDate, String pointOfSaleName) {
+        this.amount = amount;
+        this.pointOfSaleId = pointOfSaleId;
+        this.receptionDate = receptionDate;
+        this.pointOfSaleName = pointOfSaleName;
     }
 }

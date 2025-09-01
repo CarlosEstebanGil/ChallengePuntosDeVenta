@@ -26,7 +26,7 @@ PV Challenge - Entrega rápida
 - PV_Challenge_Version1_Manual.rtf (manual completo)
 
 6) Notas
-- SPRING_DATA_MONGODB_URI apunta a 'mongo' (la red de compose resuelve el nombre del servicio).
+- SPRING_DATA_MONGODB_URI apunta a 'mongo' (la red de compose resuelve el name del servicio).
 - El perfil 'compose' puede usarse para overrides (application-compose.yml) si fuera necesario.
 - Swagger UI (si usás springdoc): http://localhost:8080/swagger-ui/index.html
 - Actuator (si habilitado): http://localhost:8080/actuator/health

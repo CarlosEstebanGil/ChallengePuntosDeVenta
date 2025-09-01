@@ -6,5 +6,5 @@ import jakarta.validation.constraints.NotNull;
 public record EdgeRequest(
         @NotNull Integer fromId,
         @NotNull Integer toId,
-        @Min(0) int costo
+        @Min(0) int cost
 ) {}

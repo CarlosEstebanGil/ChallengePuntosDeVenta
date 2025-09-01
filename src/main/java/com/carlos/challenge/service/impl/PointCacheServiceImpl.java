@@ -23,22 +23,22 @@ public class PointCacheServiceImpl implements PointCacheService {
     public List<PointOfSale> findAll() {
         return points.entrySet().stream()
                 .map(e -> new PointOfSale(e.getKey(), e.getValue()))
-                .sorted((a,b) -> a.id().compareTo(b.id()))
+                .sorted(java.util.Comparator.comparing(PointOfSale::id))
                 .toList();
     }
 
     @Override
-    public PointOfSale create(Integer id, String nombre) {
-        String prev = points.putIfAbsent(id, nombre);
+    public PointOfSale create(Integer id, String name) {
+        String prev = points.putIfAbsent(id, name);
         if (prev != null) {
             throw new ResponseStatusException(CONFLICT, EL_PUNTO_CON_ID_D_YA_EXISTE.formatted(id));
         }
-        return new PointOfSale(id, nombre);
+        return new PointOfSale(id, name);
     }
 
     @Override
-    public PointOfSale update(Integer id, String nombre) {
-        return Optional.ofNullable(points.computeIfPresent(id, (k, v) -> nombre))
+    public PointOfSale update(Integer id, String name) {
+        return Optional.ofNullable(points.computeIfPresent(id, (k, v) -> name))
                 .map(n -> new PointOfSale(id, n))
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, NO_EXISTE_EL_PUNTO_CON_ID_D.formatted(id)));
     }
@@ -53,10 +53,10 @@ public class PointCacheServiceImpl implements PointCacheService {
 
     @Override
     public PointOfSale findById(Integer id) {
-        String nombre = points.get(id);
-        if (nombre == null) {
+        String name = points.get(id);
+        if (name == null) {
             throw new ResponseStatusException(NOT_FOUND, NO_EXISTE_EL_PUNTO_CON_ID_D.formatted(id));
         }
-        return new PointOfSale(id, nombre);
+        return new PointOfSale(id, name);
     }
 }

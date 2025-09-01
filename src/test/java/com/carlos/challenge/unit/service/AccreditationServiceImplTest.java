@@ -34,7 +34,7 @@ class AccreditationServiceImplTest {
     AccreditationServiceImpl service;
 
     @Test
-    void crear_ok() {
+    void create_ok() {
         PointOfSale pv = new PointOfSale(1, "Sucursal Centro");
         when(pointCache.findById(1)).thenReturn(pv);
         when(repo.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -42,9 +42,9 @@ class AccreditationServiceImplTest {
         var req = new CreateAccreditationRequest(BigDecimal.TEN, 1);
         var resp = service.create(req);
 
-        assertEquals(1, resp.idPuntoVenta());
-        assertEquals("Sucursal Centro", resp.nombrePuntoVenta());
-        assertNotNull(resp.fechaRecepcion());
+        assertEquals(1, resp.pointOfSaleId());
+        assertEquals("Sucursal Centro", resp.pointOfSaleName());
+        assertNotNull(resp.receptionDate());
     }
 
     @Test
@@ -54,7 +54,7 @@ class AccreditationServiceImplTest {
         Accreditation acc = new Accreditation(BigDecimal.ONE, 1, from, "PV1");
         acc.setId(String.valueOf(10L));
         Page<Accreditation> page = new PageImpl<>(List.of(acc));
-        when(repo.findByIdPuntoVentaAndFechaRecepcionBetween(eq(1), eq(from), eq(to), any(Pageable.class)))
+        when(repo.findBypointOfSaleIdAndReceptionDateBetween(eq(1), eq(from), eq(to), any(Pageable.class)))
                 .thenReturn(page);
 
         var result = service.list(Optional.of(1), Optional.of(from), Optional.of(to), Pageable.unpaged());
@@ -62,15 +62,15 @@ class AccreditationServiceImplTest {
         assertEquals(1, result.getTotalElements());
         var resp = result.getContent().getFirst();
         assertEquals("10", resp.id());
-        assertEquals("PV1", resp.nombrePuntoVenta());
+        assertEquals("PV1", resp.pointOfSaleName());
     }
 
     @Test
-    void list_onlyIdPuntoVenta() {
+    void list_onlypointOfSaleId() {
         Accreditation acc = new Accreditation(BigDecimal.ONE, 2, Instant.now(), "PV2");
         acc.setId(String.valueOf(20L));
         Page<Accreditation> page = new PageImpl<>(List.of(acc));
-        when(repo.findByIdPuntoVenta(eq(2), any(Pageable.class))).thenReturn(page);
+        when(repo.findBypointOfSaleId(eq(2), any(Pageable.class))).thenReturn(page);
 
         var result = service.list(Optional.of(2), Optional.empty(), Optional.empty(), Pageable.unpaged());
 
@@ -85,7 +85,7 @@ class AccreditationServiceImplTest {
         Accreditation acc = new Accreditation(BigDecimal.ONE, 3, from, "PV3");
         acc.setId(String.valueOf(30L));
         Page<Accreditation> page = new PageImpl<>(List.of(acc));
-        when(repo.findByFechaRecepcionBetween(eq(from), eq(to), any(Pageable.class))).thenReturn(page);
+        when(repo.findByreceptionDateBetween(eq(from), eq(to), any(Pageable.class))).thenReturn(page);
 
         var result = service.list(Optional.empty(), Optional.of(from), Optional.of(to), Pageable.unpaged());
 

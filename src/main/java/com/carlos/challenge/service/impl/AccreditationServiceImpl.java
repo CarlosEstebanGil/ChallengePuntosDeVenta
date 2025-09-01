@@ -28,49 +28,68 @@ public class AccreditationServiceImpl implements AccreditationService {
     @Override
     public AccreditationResponse create(CreateAccreditationRequest req) {
 
-        PointOfSale pv = pointCache.findById(req.idPuntoVenta());
+        PointOfSale pv = pointCache.findById(req.pointOfSaleId());
 
         Instant now = Instant.now();
         Accreditation acc = new Accreditation(
-                req.importe(),
-                req.idPuntoVenta(),
+                req.amount(),
+                req.pointOfSaleId(),
                 now,
-                pv.nombre()
+                pv.name()
         );
 
         Accreditation saved = repo.save(acc);
 
         return new AccreditationResponse(
                 saved.getId(),
-                saved.getImporte(),
-                saved.getIdPuntoVenta(),
-                saved.getNombrePuntoVenta(),
-                saved.getFechaRecepcion()
+                saved.getAmount(),
+                saved.getPointOfSaleId(),
+                saved.getPointOfSaleName(),
+                saved.getReceptionDate()
         );
     }
 
     @Override
-    public Page<AccreditationResponse> list(Optional<Integer> idPuntoVenta,
+    public Page<AccreditationResponse> list(Optional<Integer> pointOfSaleId,
                                               Optional<Instant> from,
                                               Optional<Instant> to,
                                               Pageable pageable) {
 
-        boolean hasPv = idPuntoVenta.isPresent();
+        boolean hasPv = pointOfSaleId.isPresent();
         boolean hasRange = from.isPresent() && to.isPresent(); //solo aplica el filtro de fechas si vienen ambos from y to sino hago findall
 
         Page<Accreditation> page;
         if (hasPv && hasRange) {
-            page = repo.findByIdPuntoVentaAndFechaRecepcionBetween(idPuntoVenta.get(), from.get(), to.get(), pageable);
+            page = repo.findBypointOfSaleIdAndReceptionDateBetween(pointOfSaleId.get(), from.get(), to.get(), pageable);
         } else if (hasPv) {
-            page = repo.findByIdPuntoVenta(idPuntoVenta.get(), pageable);
+            page = repo.findBypointOfSaleId(pointOfSaleId.get(), pageable);
         } else if (hasRange) {
-            page = repo.findByFechaRecepcionBetween(from.get(), to.get(), pageable);
+            page = repo.findByreceptionDateBetween(from.get(), to.get(), pageable);
         } else {
             page = repo.findAll(pageable);
         }
 
         return page.map(a -> new AccreditationResponse(
-                a.getId(), a.getImporte(), a.getIdPuntoVenta(), a.getNombrePuntoVenta(), a.getFechaRecepcion()
+                a.getId(), a.getAmount(), a.getPointOfSaleId(), a.getPointOfSaleName(), a.getReceptionDate()
         ));
+    }
+    @Override
+    public void delete(String id) {
+        if (!repo.existsById(id)) {
+            throw new IllegalArgumentException("Accreditation not found with id: " + id);
+        }
+        repo.deleteById(id);
+    }
+
+    @Override
+    public Optional<AccreditationResponse> findById(String id) {
+        return repo.findById(id)
+                .map(a -> new AccreditationResponse(
+                        a.getId(),
+                        a.getAmount(),
+                        a.getPointOfSaleId(),
+                        a.getPointOfSaleName(),
+                        a.getReceptionDate()
+                ));
     }
 }

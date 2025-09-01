@@ -18,7 +18,7 @@ public class GraphServiceImpl implements GraphService {
 
     public static final String NO_EXISTE_CAMINO_ENTRE_D_Y_D = "No existe camino entre %d y %d";
     public static final String NO_SE_PERMITE_ARISTA_REFLEXIVA_FROM_ID_TO_ID = "No se permite arista reflexiva (fromId==toId)";
-    public static final String EL_COSTO_DEBE_SER_0 = "El costo debe ser >= 0";
+    public static final String EL_cost_DEBE_SER_0 = "El cost debe ser >= 0";
 
     private final ConcurrentMap<Integer, ConcurrentMap<Integer, Integer>> adj = new ConcurrentHashMap<>();
 
@@ -29,19 +29,19 @@ public class GraphServiceImpl implements GraphService {
     }
 
     @Override
-    public void upsertEdge(int fromId, int toId, int costo) {
+    public void upsertEdge(int fromId, int toId, int cost) {
         if (fromId == toId) {
             throw new ResponseStatusException(BAD_REQUEST, NO_SE_PERMITE_ARISTA_REFLEXIVA_FROM_ID_TO_ID);
         }
-        if (costo < 0) {
-            throw new ResponseStatusException(BAD_REQUEST, EL_COSTO_DEBE_SER_0);
+        if (cost < 0) {
+            throw new ResponseStatusException(BAD_REQUEST, EL_cost_DEBE_SER_0);
         }
 
         PointOfSale a = pointCache.findById(fromId);
         PointOfSale b = pointCache.findById(toId);
 
-        adj.computeIfAbsent(a.id(), k -> new ConcurrentHashMap<>()).put(b.id(), costo);
-        adj.computeIfAbsent(b.id(), k -> new ConcurrentHashMap<>()).put(a.id(), costo);  // B->A
+        adj.computeIfAbsent(a.id(), k -> new ConcurrentHashMap<>()).put(b.id(), cost);
+        adj.computeIfAbsent(b.id(), k -> new ConcurrentHashMap<>()).put(a.id(), cost);  // B->A
     }
 
     @Override
@@ -63,11 +63,11 @@ public class GraphServiceImpl implements GraphService {
 
         List<NeighborResponse> list = new ArrayList<>();
         for (Map.Entry<Integer, Integer> e : neighbors.entrySet()) {
-            PointOfSale nb = pointCache.findById(e.getKey()); // resuelvo nombre
-            list.add(new NeighborResponse(nb.id(), nb.nombre(), e.getValue()));
+            PointOfSale nb = pointCache.findById(e.getKey()); // resuelvo name
+            list.add(new NeighborResponse(nb.id(), nb.name(), e.getValue()));
         }
 
-        list.sort(Comparator.comparingInt(NeighborResponse::costo).thenComparing(NeighborResponse::id));
+        list.sort(Comparator.comparingInt(NeighborResponse::cost).thenComparing(NeighborResponse::id));
         return list;
     }
 
@@ -77,7 +77,7 @@ public class GraphServiceImpl implements GraphService {
         PointOfSale to   = pointCache.findById(toId);
 
         if (from.id().equals(to.id())) {
-            return new MinPathResponse(0, List.of(from.id()), List.of(from.nombre()));
+            return new MinPathResponse(0, List.of(from.id()), List.of(from.name()));
         }
 
         // Dijkstra (read only)
@@ -122,10 +122,10 @@ public class GraphServiceImpl implements GraphService {
                 break;
         }
 
-        List<String> nombres = path.stream()
-                .map(id -> pointCache.findById(id).nombre())
+        List<String> names = path.stream()
+                .map(id -> pointCache.findById(id).name())
                 .toList();
 
-        return new MinPathResponse(best, List.copyOf(path), nombres);
+        return new MinPathResponse(best, List.copyOf(path), names);
     }
 }
