@@ -342,7 +342,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/accreditations?idPuntoVenta=2&page=0&size=10",
+							"raw": "{{baseUrl}}/api/accreditations?pointOfSaleId=1&page=0&size=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -352,8 +352,8 @@
 							],
 							"query": [
 								{
-									"key": "idPuntoVenta",
-									"value": "2"
+									"key": "pointOfSaleId",
+									"value": "1"
 								},
 								{
 									"key": "page",
@@ -492,7 +492,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"fromId\": 1,\n  \"toId\": 4,\n  \"costo\": 5\n}"
+							"raw": "{\n  \"fromId\": 2,\n  \"toId\": 10,\n  \"cost\": 6\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/costs",
@@ -692,19 +692,19 @@
 					"response": []
 				},
 				{
-					"name": "Crear PV con USER (403)",
+					"name": "Crear PV con BADUSER (401)",
 					"request": {
 						"auth": {
 							"type": "basic",
 							"basic": [
 								{
-									"key": "username",
-									"value": "user",
+									"key": "password",
+									"value": "baduser",
 									"type": "string"
 								},
 								{
-									"key": "password",
-									"value": "user",
+									"key": "username",
+									"value": "baduser",
 									"type": "string"
 								}
 							]
@@ -719,7 +719,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"id\": 2,\n  \"nombre\": \"Sucursal Norte\"\n}"
+							"raw": "{\n  \"id\": 11,\n  \"name\": \"Sucursal Norte\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/pos",
