@@ -1,7 +1,9 @@
+// com.carlos.challenge.service.impl.GraphServiceImpl
 package com.carlos.challenge.service.impl;
 
-import com.carlos.challenge.dto.MinPathResponse;
+import com.carlos.challenge.dto.MinPathsResponse;
 import com.carlos.challenge.dto.NeighborResponse;
+import com.carlos.challenge.dto.PathDetail;
 import com.carlos.challenge.model.PointOfSale;
 import com.carlos.challenge.service.GraphService;
 import com.carlos.challenge.service.PointCacheService;
@@ -11,53 +13,57 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.StampedLock;
-
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class GraphServiceImpl implements GraphService {
 
-    public static final String NO_EXISTE_CAMINO_ENTRE_D_Y_D = "No existe camino entre %d y %d";
-    public static final String NO_SE_PERMITE_ARISTA_REFLEXIVA_FROM_ID_TO_ID = "No se permite arista reflexiva (fromId==toId)";
-    public static final String EL_cost_DEBE_SER_0 = "El cost debe ser >= 0";
+    public static final String NO_EXISTE_CAMINO_MÍNIMO_ENTRE_LOS_PUNTOS = "There is no minimum path between the points";
+    public static final String NO_SE_PERMITE_ARISTA_REFLEXIVA = "Reflexive edge is not allowed";
+    public static final String EL_COSTO_DEBE_SER_0 = "The cost must be >= 0";
+    private final PointCacheService points;
 
-    private final ConcurrentMap<Integer, ConcurrentMap<Integer, Integer>> adj = new ConcurrentHashMap<>();
-
-    private final PointCacheService pointCache;
+    private final ConcurrentMap<String, ConcurrentMap<String, Integer>> adj = new ConcurrentHashMap<>();
 
     private final StampedLock lock = new StampedLock();
 
-    public GraphServiceImpl(PointCacheService pointCache) {
-        this.pointCache = pointCache;
+    public GraphServiceImpl(PointCacheService points) {
+        this.points = points;
     }
 
     @Override
-    public void upsertEdge(int fromId, int toId, int cost) {
-        if (fromId == toId) {
-            throw new ResponseStatusException(BAD_REQUEST, NO_SE_PERMITE_ARISTA_REFLEXIVA_FROM_ID_TO_ID);
-        }
+    public void upsertEdge(String fromIdOrCode, String toIdOrCode, int cost) {
         if (cost < 0) {
-            throw new ResponseStatusException(BAD_REQUEST, EL_cost_DEBE_SER_0);
+            throw new ResponseStatusException(BAD_REQUEST, EL_COSTO_DEBE_SER_0);
         }
 
-        PointOfSale a = pointCache.findById(fromId);
-        PointOfSale b = pointCache.findById(toId);
+        final String fromId = points.resolveId(fromIdOrCode);
+        final String toId   = points.resolveId(toIdOrCode);
 
-        long stamp = lock.writeLock(); //solo 1 thread a la vez puede modificar el grafo
+        if (fromId.equals(toId)) {
+            throw new ResponseStatusException(BAD_REQUEST, NO_SE_PERMITE_ARISTA_REFLEXIVA);
+        }
+
+        points.findById(fromId);
+        points.findById(toId);
+
+        long stamp = lock.writeLock();
         try {
-            adj.computeIfAbsent(a.id(), k -> new ConcurrentHashMap<>()).put(b.id(), cost);
-            adj.computeIfAbsent(b.id(), k -> new ConcurrentHashMap<>()).put(a.id(), cost);// B->A
+            adj.computeIfAbsent(fromId, k -> new ConcurrentHashMap<>()).put(toId, cost);
+            adj.computeIfAbsent(toId,   k -> new ConcurrentHashMap<>()).put(fromId, cost);
         } finally {
             lock.unlockWrite(stamp);
         }
     }
 
     @Override
-    public void removeEdge(int fromId, int toId) {
+    public void removeEdge(String fromIdOrCode, String toIdOrCode) {
+        final String fromId = points.resolveId(fromIdOrCode);
+        final String toId   = points.resolveId(toIdOrCode);
 
-        pointCache.findById(fromId);
-        pointCache.findById(toId);
+        points.findById(fromId);
+        points.findById(toId);
 
         long stamp = lock.writeLock();
         try {
@@ -69,18 +75,19 @@ public class GraphServiceImpl implements GraphService {
     }
 
     @Override
-    public List<NeighborResponse> neighborsOf(int fromId) {
-        PointOfSale pv = pointCache.findById(fromId);
+    public List<NeighborResponse> neighborsOf(String idOrCode) {
+        final String id = points.resolveId(idOrCode);
+
+        points.findById(id);
 
         long stamp = lock.tryOptimisticRead();
-        Map<Integer, Integer> snapshot = adj.getOrDefault(pv.id(), new ConcurrentHashMap<>());
-
-        Map<Integer, Integer> copy = new HashMap<>(snapshot);
+        Map<String, Integer> snap = adj.getOrDefault(id, new ConcurrentHashMap<>());
+        Map<String, Integer> copy = new HashMap<>(snap);
         if (!lock.validate(stamp)) {
             stamp = lock.readLock();
             try {
-                snapshot = adj.getOrDefault(pv.id(), new ConcurrentHashMap<>());
-                copy = new HashMap<>(snapshot);
+                snap = adj.getOrDefault(id, new ConcurrentHashMap<>());
+                copy = new HashMap<>(snap);
             } finally {
                 lock.unlockRead(stamp);
             }
@@ -88,82 +95,138 @@ public class GraphServiceImpl implements GraphService {
 
         if (copy.isEmpty()) return List.of();
 
-        List<NeighborResponse> list = new ArrayList<>(copy.size());
-        for (Map.Entry<Integer, Integer> e : copy.entrySet()) {
-            PointOfSale nb = pointCache.findById(e.getKey());
-            list.add(new NeighborResponse(nb.id(), nb.name(), e.getValue()));
+        List<NeighborResponse> out = new ArrayList<>(copy.size());
+        for (var e : copy.entrySet()) {
+            PointOfSale p = points.findById(e.getKey());
+            out.add(new NeighborResponse(p.id(), p.name(), e.getValue()));
         }
-        list.sort(Comparator.comparingInt(NeighborResponse::cost).thenComparing(NeighborResponse::id));
-        return list;
+
+        out.sort(Comparator
+                .comparing(NeighborResponse::name, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(NeighborResponse::id));
+        return out;
     }
 
     @Override
-    public MinPathResponse shortestPath(int fromId, int toId) {
-        PointOfSale from = pointCache.findById(fromId);
-        PointOfSale to   = pointCache.findById(toId);
-        if (from.id().equals(to.id())) {
-            return new MinPathResponse(0, List.of(from.id()), List.of(from.name()));
+    public MinPathsResponse shortestPaths(String fromIdOrCode, String toIdOrCode) {
+        final String start = points.resolveId(fromIdOrCode);
+        final String goal  = points.resolveId(toIdOrCode);
+
+        points.findById(start);
+        points.findById(goal);
+
+        if (start.equals(goal)) {
+            PointOfSale p = points.findById(start);
+            PathDetail path = new PathDetail(
+                    List.of(p.id()),
+                    List.of(p.name()),
+                    List.of(p.code())
+            );
+            return new MinPathsResponse(0, List.of(path));
         }
 
-        Map<Integer, Map<Integer, Integer>> graph;
-        long stamp = lock.tryOptimisticRead();
-        graph = deepSnapshot(adj);
-        if (!lock.validate(stamp)) {
-            stamp = lock.readLock();
-            try {
-                graph = deepSnapshot(adj);
-            } finally {
-                lock.unlockRead(stamp);
-            }
-        }
+        Map<String, Map<String, Integer>> graph = deepSnapshot(adj);
 
-        // Dijkstra sobre el snapshot inmutable
-        Map<Integer, Integer> dist = new HashMap<>();
-        Map<Integer, Integer> prev = new HashMap<>();
-        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
-        dist.put(from.id(), 0);
-        pq.offer(new int[]{from.id(), 0});
+        Map<String, Integer> dist = new HashMap<>();
+        Map<String, Set<String>> preds = new HashMap<>();
+        Set<String> visited = new HashSet<>();
+        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingInt(n -> dist.getOrDefault(n, Integer.MAX_VALUE)));
+
+        graph.keySet().forEach(n -> dist.put(n, Integer.MAX_VALUE));
+        dist.put(start, 0);
+        pq.add(start);
 
         while (!pq.isEmpty()) {
-            int[] cur = pq.poll();
-            int u = cur[0], du = cur[1];
-            if (du != dist.getOrDefault(u, Integer.MAX_VALUE)) continue;
-            if (u == to.id()) break;
+            String u = pq.poll();
+            if (!visited.add(u)) continue;
+            if (u.equals(goal)) break;
 
-            Map<Integer, Integer> neigh = graph.getOrDefault(u, Map.of());
-            for (Map.Entry<Integer, Integer> e : neigh.entrySet()) {
-                int v = e.getKey(), w = e.getValue();
+            for (var e : graph.getOrDefault(u, Map.of()).entrySet()) {
+                String v = e.getKey();
+                int w = e.getValue();
+                if (w < 0) continue;
+
+                int du = dist.getOrDefault(u, Integer.MAX_VALUE);
+                if (du == Integer.MAX_VALUE) continue;
+
                 int alt = du + w;
-                if (alt < dist.getOrDefault(v, Integer.MAX_VALUE)) {
+                int dv  = dist.getOrDefault(v, Integer.MAX_VALUE);
+
+                if (alt < dv) {
                     dist.put(v, alt);
-                    prev.put(v, u);
-                    pq.offer(new int[]{v, alt});
+                    preds.put(v, new HashSet<>(List.of(u)));
+                    pq.add(v);
+                } else if (alt == dv) {
+                    preds.computeIfAbsent(v, k -> new HashSet<>()).add(u);
                 }
             }
         }
 
-        Integer best = dist.get(to.id());
-        if (best == null) {
-            throw new ResponseStatusException(NOT_FOUND,
-                    NO_EXISTE_CAMINO_ENTRE_D_Y_D.formatted(from.id(), to.id()));
+        int best = dist.getOrDefault(goal, Integer.MAX_VALUE);
+        if (best == Integer.MAX_VALUE) {
+            throw new ResponseStatusException(NOT_FOUND, NO_EXISTE_CAMINO_MÍNIMO_ENTRE_LOS_PUNTOS);
         }
 
-        LinkedList<Integer> path = new LinkedList<>();
-        for (Integer v = to.id(); v != null; v = prev.get(v)) {
-            path.addFirst(v);
-            if (v.equals(from.id())) break;
-        }
-        List<String> names = path.stream().map(id -> pointCache.findById(id).name()).toList();
-        return new MinPathResponse(best, List.copyOf(path), names);
+               List<List<String>> allPaths = new ArrayList<>();
+        Deque<String> stack = new ArrayDeque<>();
+        stack.push(goal);
+        backtrackPaths(start, goal, preds, stack, allPaths);
+
+                List<PathDetail> details = allPaths.stream()
+                .map(routeIds -> {
+                    List<String> ids = List.copyOf(routeIds);
+                    List<String> names = ids.stream()
+                            .map(points::findById)
+                            .map(PointOfSale::name)
+                            .toList();
+                    List<Integer> codes = ids.stream()
+                            .map(points::findById)
+                            .map(PointOfSale::code)
+                            .toList();
+                    return new PathDetail(ids, names, codes);
+                })
+                .toList();
+
+        return new MinPathsResponse(best, details);
     }
 
-    private static Map<Integer, Map<Integer, Integer>> deepSnapshot(
-            ConcurrentMap<Integer, ConcurrentMap<Integer, Integer>> source) {
-        Map<Integer, Map<Integer, Integer>> copy = new HashMap<>(source.size());
-        for (Map.Entry<Integer, ConcurrentMap<Integer, Integer>> e : source.entrySet()) {
+    private static void backtrackPaths(String start, String current,
+                                       Map<String, Set<String>> preds,
+                                       Deque<String> stack,
+                                       List<List<String>> out) {
+        if (current.equals(start)) {
+            out.add(new ArrayList<>(stack));
+            return;
+        }
+        for (String p : preds.getOrDefault(current, Set.of())) {
+            stack.push(p);
+            backtrackPaths(start, p, preds, stack, out);
+            stack.pop();
+        }
+    }
+
+    private Map<String, Map<String, Integer>> deepSnapshot(
+            ConcurrentMap<String, ConcurrentMap<String, Integer>> source) {
+
+        long stamp = lock.tryOptimisticRead();
+        Map<String, Map<String, Integer>> copy = copyAdj(source);
+        if (!lock.validate(stamp)) {
+            stamp = lock.readLock();
+            try {
+                copy = copyAdj(source);
+            } finally {
+                lock.unlockRead(stamp);
+            }
+        }
+        return copy;
+    }
+
+    private static Map<String, Map<String, Integer>> copyAdj(
+            ConcurrentMap<String, ConcurrentMap<String, Integer>> source) {
+        Map<String, Map<String, Integer>> copy = new HashMap<>(source.size());
+        for (var e : source.entrySet()) {
             copy.put(e.getKey(), new HashMap<>(e.getValue()));
         }
         return copy;
     }
 }
-

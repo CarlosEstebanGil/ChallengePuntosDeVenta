@@ -7,5 +7,5 @@ import java.math.BigDecimal;
 
 public record CreateAccreditationRequest(
         @NotNull @Positive BigDecimal amount,
-        @NotNull Integer pointOfSaleId
+        @NotNull String pointOfSaleId
 ) {}

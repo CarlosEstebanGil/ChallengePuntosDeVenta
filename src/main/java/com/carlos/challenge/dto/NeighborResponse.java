@@ -1,7 +1,7 @@
 package com.carlos.challenge.dto;
 
 public record NeighborResponse(
-        Integer id,
+        String id,
         String name,
         int cost
 ) {}

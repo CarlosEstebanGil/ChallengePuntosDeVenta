@@ -4,6 +4,7 @@ import com.carlos.challenge.controller.AccreditationController;
 import com.carlos.challenge.dto.AccreditationResponse;
 import com.carlos.challenge.service.AccreditationService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,12 +21,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -44,34 +44,39 @@ class AccreditationControllerTest {
             return http
                     .csrf(csrf -> csrf.disable())
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers(POST, "/api/accreditations").authenticated()
-                            .requestMatchers(GET,  "/api/accreditations/**").authenticated()
-                            .requestMatchers(DELETE, "/api/accreditations/**").authenticated()
+                            .requestMatchers(POST,   "/api/accreditations").authenticated()
+                            .requestMatchers(GET,    "/api/accreditations/**").authenticated()
+                            .requestMatchers(DELETE, "/api/accreditations/**").hasRole("ADMIN")
                             .anyRequest().denyAll()
                     )
                     .httpBasic(b -> {})
                     .build();
         }
     }
+
     @Autowired MockMvc mvc;
 
     @MockitoBean AccreditationService service;
+
 
     @Test
     @WithMockUser(roles = {"USER"})
     void create_ok() throws Exception {
         AccreditationResponse dto = new AccreditationResponse(
-                "abc123", new BigDecimal("1234.56"), 1, "Sucursal Centro", Instant.now()
+                "abc123", new BigDecimal("1234.56"), "pos-1", "Sucursal Centro", Instant.now()
         );
         when(service.create(any())).thenReturn(dto);
 
         mvc.perform(post("/api/accreditations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {"amount":1234.56,"pointOfSaleId":1}
-                        """))
+                                {
+                                  "amount": 1234.56,
+                                  "pointOfSaleId": "pos-1"
+                                }
+                                """))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.pointOfSaleId").value(1))
+                .andExpect(jsonPath("$.pointOfSaleId").value("pos-1"))
                 .andExpect(jsonPath("$.pointOfSaleName").value("Sucursal Centro"));
     }
 
@@ -80,8 +85,11 @@ class AccreditationControllerTest {
         mvc.perform(post("/api/accreditations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {"amount":10,"pointOfSaleId":1}
-                        """))
+                                {
+                                  "amount": 10,
+                                  "pointOfSaleId": "pos-1"
+                                }
+                                """))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -91,8 +99,11 @@ class AccreditationControllerTest {
         mvc.perform(post("/api/accreditations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                        {"amount":null,"pointOfSaleId":null}
-                        """))
+                                {
+                                  "amount": null,
+                                  "pointOfSaleId": null
+                                }
+                                """))
                 .andExpect(status().isBadRequest());
     }
 
@@ -100,7 +111,7 @@ class AccreditationControllerTest {
     @WithMockUser(roles = {"USER"})
     void list_ok_sin_filtros() throws Exception {
         AccreditationResponse dto = new AccreditationResponse(
-                "abc", BigDecimal.TEN, 1, "Sucursal Centro", Instant.now()
+                "abc", BigDecimal.TEN, "pos-1", "Sucursal Centro", Instant.now()
         );
         Page<AccreditationResponse> page = new PageImpl<>(List.of(dto), PageRequest.of(0, 20), 1);
 
@@ -110,7 +121,7 @@ class AccreditationControllerTest {
         mvc.perform(get("/api/accreditations?page=0&size=20"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1))
-                .andExpect(jsonPath("$.content[0].pointOfSaleId").value(1));
+                .andExpect(jsonPath("$.content[0].pointOfSaleId").value("pos-1"));
     }
 
     @Test
@@ -122,16 +133,20 @@ class AccreditationControllerTest {
     @Test
     @WithMockUser(roles = {"USER"})
     void list_filtrando_por_pv() throws Exception {
-        Page<AccreditationResponse> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
+        Page<AccreditationResponse> page =
+                new PageImpl<AccreditationResponse>(List.of(), PageRequest.of(0, 10), 0);
 
-        when(service.list(eq(Optional.of(1)), eq(Optional.empty()), eq(Optional.empty()), any()))
-                .thenReturn(page);
+        when(service.list(
+                ArgumentMatchers.<Optional<String>>eq(Optional.of("pos-1")),
+                ArgumentMatchers.<Optional<Instant>>eq(Optional.empty()),
+                ArgumentMatchers.<Optional<Instant>>eq(Optional.empty()),
+                any(Pageable.class)
+        )).thenReturn(page);
 
-        mvc.perform(get("/api/accreditations?pointOfSaleId=1&page=0&size=10"))
+        mvc.perform(get("/api/accreditations?pointOfSaleId=pos-1&page=0&size=10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray());
     }
-
     @Test
     @WithMockUser(roles = {"USER"})
     void list_filtrando_por_fecha() throws Exception {

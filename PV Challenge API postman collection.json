@@ -38,7 +38,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"id\": 11,\n  \"name\": \"Sucursal aislada 11\"\n}"
+							"raw": "{\n  \"name\": \"Sucursal aislada 11\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/pointsofsale",
@@ -47,7 +47,7 @@
 							],
 							"path": [
 								"api",
-								"pos"
+								"pointsofsale"
 							]
 						},
 						"description": "Crea un punto de venta"
@@ -87,7 +87,7 @@
 							],
 							"path": [
 								"api",
-								"pos"
+								"pointsofsale"
 							]
 						}
 					},
@@ -120,14 +120,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/pointsofsale/1",
+							"raw": "{{baseUrl}}/api/pointsofsale/e3d21823-2fb5-4d3d-bdf6-8bd2a26b9b22",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"pos",
-								"1"
+								"pointsofsale",
+								"e3d21823-2fb5-4d3d-bdf6-8bd2a26b9b22"
 							]
 						}
 					},
@@ -161,17 +161,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Sucursal AISLADA 11 (actualizada)\"\n}"
+							"raw": "{\n  \"name\": \"CABA (actualizada)\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/pointsofsale/12",
+							"raw": "{{baseUrl}}/api/pointsofsale/20afa6d3-b1b6-4dda-ac26-2f94aadd2314",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"pos",
-								"12"
+								"pointsofsale",
+								"20afa6d3-b1b6-4dda-ac26-2f94aadd2314"
 							]
 						}
 					},
@@ -204,14 +204,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/pointsofsale/11",
+							"raw": "{{baseUrl}}/api/pointsofsale/e3d21823-2fb5-4d3d-bdf6-8bd2a26b9b22",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"pos",
-								"11"
+								"pointsofsale",
+								"e3d21823-2fb5-4d3d-bdf6-8bd2a26b9b22"
 							]
 						}
 					},
@@ -250,7 +250,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"amount\": 1234.56,\n  \"pointOfSaleId\": 1\n}"
+							"raw": "{\n  \"amount\": 1234.56,\n  \"pointOfSaleId\": \"20afa6d3-b1b6-4dda-ac26-2f94aadd2314\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/accreditations",
@@ -342,7 +342,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/accreditations?pointOfSaleId=1&page=0&size=10",
+							"raw": "{{baseUrl}}/api/accreditations?pointOfSaleId=20afa6d3-b1b6-4dda-ac26-2f94aadd2314&page=0&size=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -353,7 +353,7 @@
 							"query": [
 								{
 									"key": "pointOfSaleId",
-									"value": "1"
+									"value": "20afa6d3-b1b6-4dda-ac26-2f94aadd2314"
 								},
 								{
 									"key": "page",
@@ -395,7 +395,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/accreditations?from=2025-09-01T00:00:00Z&to=2025-09-02T00:00:00Z&page=0&size=10",
+							"raw": "{{baseUrl}}/api/accreditations?from=2025-09-03T00:00:00Z&to=2025-09-04T00:00:00Z&page=0&size=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -406,11 +406,11 @@
 							"query": [
 								{
 									"key": "from",
-									"value": "2025-09-01T00:00:00Z"
+									"value": "2025-09-03T00:00:00Z"
 								},
 								{
 									"key": "to",
-									"value": "2025-09-02T00:00:00Z"
+									"value": "2025-09-04T00:00:00Z"
 								},
 								{
 									"key": "page",
@@ -446,14 +446,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/accreditations/68b5d05ee0edbc0a9a498ad3",
+							"raw": "{{baseUrl}}/api/accreditations/68b7c0b7fe73ab30f32e0a2b",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"accreditations",
-								"68b5d05ee0edbc0a9a498ad3"
+								"68b7c0b7fe73ab30f32e0a2b"
 							]
 						}
 					},
@@ -492,7 +492,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"fromId\": 2,\n  \"toId\": 10,\n  \"cost\": 6\n}"
+							"raw": "{\n  \"fromId\":  \"affe6258-175f-4737-94ac-9c139237a901\",\n  \"toId\":   \"3459c474-989a-4d92-8dd8-6ed8941c5580\",\n  \"cost\":   6\n}\n"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/graph/costs",
@@ -501,6 +501,7 @@
 							],
 							"path": [
 								"api",
+								"graph",
 								"costs"
 							]
 						},
@@ -515,13 +516,13 @@
 							"type": "basic",
 							"basic": [
 								{
-									"key": "username",
-									"value": "user",
+									"key": "password",
+									"value": "admin",
 									"type": "string"
 								},
 								{
-									"key": "password",
-									"value": "user",
+									"key": "username",
+									"value": "admin",
 									"type": "string"
 								}
 							]
@@ -534,25 +535,24 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fromId\": \"affe6258-175f-4737-94ac-9c139237a901\",\r\n  \"toId\": \"3459c474-989a-4d92-8dd8-6ed8941c5580\",\r\n  \"cost\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{baseUrl}}/api/graph/costs/edges?from=1&to=2",
+							"raw": "{{baseUrl}}/api/graph/costs",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"costs",
-								"edges"
-							],
-							"query": [
-								{
-									"key": "from",
-									"value": "1"
-								},
-								{
-									"key": "to",
-									"value": "2"
-								}
+								"graph",
+								"costs"
 							]
 						}
 					},
@@ -585,15 +585,16 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/graph/costs/neighbors/3",
+							"raw": "{{baseUrl}}/api/graph/costs/neighbors/2",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
+								"graph",
 								"costs",
 								"neighbors",
-								"3"
+								"2"
 							]
 						}
 					},
@@ -626,14 +627,15 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/graph/costs/min-path?from=1&to=7",
+							"raw": "{{baseUrl}}/api/graph/costs/min-paths?from=1&to=7",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
+								"graph",
 								"costs",
-								"min-path"
+								"min-paths"
 							],
 							"query": [
 								{
@@ -722,7 +724,7 @@
 							"raw": "{\n  \"id\": 11,\n  \"name\": \"Sucursal Norte\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/pointsofsale",
+							"raw": "{{baseUrl}}/api/pos",
 							"host": [
 								"{{baseUrl}}"
 							],

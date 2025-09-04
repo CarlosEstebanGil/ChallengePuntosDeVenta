@@ -13,7 +13,7 @@ PV Challenge - Entrega rápida
 
 3) Probar (usuarios demo)
 - user/user y admin/admin
-- Ejemplo: curl -i -u user:user http://localhost:8080/api/pos
+- Ejemplo: curl -i -u user:user http://localhost:8080/api/pointsofsale
 
 4) Postman
 - Importar pv-challenge.postman_collection.json

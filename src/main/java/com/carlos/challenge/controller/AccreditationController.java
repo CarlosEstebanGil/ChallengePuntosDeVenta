@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 import java.time.Instant;
 import java.util.Optional;
@@ -30,7 +29,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccreditationController {
 
-    public static final String API_ACREDITACIONES = "/api/accreditations/";
+    public static final String API_ACCREDITATIONS = "/api/accreditations/";
     private final AccreditationService service;
 
     @Operation(
@@ -54,7 +53,7 @@ public class AccreditationController {
             @RequestBody @Valid CreateAccreditationRequest req) {
         var created = service.create(req);
         return ResponseEntity
-                .created(URI.create(API_ACREDITACIONES + created.id()))
+                .created(URI.create(API_ACCREDITATIONS + created.id()))
                 .body(created);
     }
 
@@ -70,7 +69,7 @@ public class AccreditationController {
     })
     @GetMapping
     public ResponseEntity<Page<AccreditationResponse>> list(
-            @RequestParam(required = false) Integer pointOfSaleId,
+            @RequestParam(required = false) String pointOfSaleId, // <-- String (antes Integer)
             @RequestParam(name = "from", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
             @RequestParam(name = "to", required = false)
@@ -80,10 +79,12 @@ public class AccreditationController {
     ) {
         PageRequest pr = PageRequest.of(page, size);
         return ResponseEntity.ok(
-                service.list(Optional.ofNullable(pointOfSaleId),
+                service.list(
+                        Optional.ofNullable(pointOfSaleId), // <-- Optional<String>
                         Optional.ofNullable(from),
                         Optional.ofNullable(to),
-                        pr)
+                        pr
+                )
         );
     }
 

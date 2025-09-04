@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -25,7 +24,7 @@ public class Accreditation {
     private BigDecimal amount;
 
     @Indexed
-    private Integer pointOfSaleId;
+    private String pointOfSaleId;
 
     @Indexed
     private Instant receptionDate;
@@ -33,7 +32,7 @@ public class Accreditation {
 
     public Accreditation() {}
 
-    public Accreditation(BigDecimal amount, Integer pointOfSaleId, Instant receptionDate, String pointOfSaleName) {
+    public Accreditation(BigDecimal amount, String pointOfSaleId, Instant receptionDate, String pointOfSaleName) {
         this.amount = amount;
         this.pointOfSaleId = pointOfSaleId;
         this.receptionDate = receptionDate;
