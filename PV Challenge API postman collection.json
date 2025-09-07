@@ -1,0 +1,793 @@
+{
+	"info": {
+		"_postman_id": "ced3b013-9538-4f1b-86c7-795cafb6c27f",
+		"name": "PV Challenge API (Local)",
+		"description": "Colección Postman para Puntos de Venta, Acreditaciones y Grafo.\nIncluye ejemplos de filtros y pruebas de seguridad (Basic).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10654562"
+	},
+	"item": [
+		{
+			"name": "Puntos de Venta (/api/pointsofsale)",
+			"item": [
+				{
+					"name": "Crear PV (ADMIN)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Sucursal aislada 11\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/pointsofsale",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pointsofsale"
+							]
+						},
+						"description": "Crea un punto de venta"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar PV (USER/ADMIN)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/pointsofsale",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pointsofsale"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener PV por ID (USER/ADMIN)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/pointsofsale/e3d21823-2fb5-4d3d-bdf6-8bd2a26b9b22",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pointsofsale",
+								"e3d21823-2fb5-4d3d-bdf6-8bd2a26b9b22"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar PV (ADMIN)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"CABA (actualizada)\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/pointsofsale/20afa6d3-b1b6-4dda-ac26-2f94aadd2314",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pointsofsale",
+								"20afa6d3-b1b6-4dda-ac26-2f94aadd2314"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar PV (ADMIN)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/pointsofsale/e3d21823-2fb5-4d3d-bdf6-8bd2a26b9b22",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pointsofsale",
+								"e3d21823-2fb5-4d3d-bdf6-8bd2a26b9b22"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Acreditaciones (/api/accreditations)",
+			"item": [
+				{
+					"name": "Crear Acreditación (USER/ADMIN)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 1234.56,\n  \"pointOfSaleId\": \"20afa6d3-b1b6-4dda-ac26-2f94aadd2314\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/accreditations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accreditations"
+							]
+						},
+						"description": "Crea una acreditación para PV existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar (paginado)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/accreditations?page=0&size=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accreditations"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar filtrando por PV",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/accreditations?pointOfSaleId=20afa6d3-b1b6-4dda-ac26-2f94aadd2314&page=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accreditations"
+							],
+							"query": [
+								{
+									"key": "pointOfSaleId",
+									"value": "20afa6d3-b1b6-4dda-ac26-2f94aadd2314"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar filtrando por rango fechas",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/accreditations?from=2025-09-03T00:00:00Z&to=2025-09-04T00:00:00Z&page=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accreditations"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "2025-09-03T00:00:00Z"
+								},
+								{
+									"key": "to",
+									"value": "2025-09-04T00:00:00Z"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar por id",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/accreditations/68b7c0b7fe73ab30f32e0a2b",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accreditations",
+								"68b7c0b7fe73ab30f32e0a2b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Grafo (/api/graph/costs)",
+			"item": [
+				{
+					"name": "Upsert arista (USER/ADMIN)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fromId\":  \"affe6258-175f-4737-94ac-9c139237a901\",\n  \"toId\":   \"3459c474-989a-4d92-8dd8-6ed8941c5580\",\n  \"cost\":   6\n}\n"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/graph/costs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"graph",
+								"costs"
+							]
+						},
+						"description": "Crea/actualiza arista bidireccional con costo"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar arista (USER/ADMIN)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fromId\": \"affe6258-175f-4737-94ac-9c139237a901\",\r\n  \"toId\": \"3459c474-989a-4d92-8dd8-6ed8941c5580\",\r\n  \"cost\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/graph/costs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"graph",
+								"costs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Vecinos de un nodo (USER/ADMIN)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/graph/costs/neighbors/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"graph",
+								"costs",
+								"neighbors",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Camino mínimo (USER/ADMIN)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/graph/costs/min-paths?from=1&to=7",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"graph",
+								"costs",
+								"min-paths"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "1"
+								},
+								{
+									"key": "to",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seguridad / Casos negativos",
+			"item": [
+				{
+					"name": "Listar acreditaciones SIN auth (401)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/acreditaciones?page=0&size=5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"acreditaciones"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear PV con BADUSER (401)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "baduser",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "baduser",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 11,\n  \"name\": \"Sucursal Norte\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/pos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"pos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "username",
+				"value": "{{username}}",
+				"type": "string"
+			},
+			{
+				"key": "password",
+				"value": "{{password}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "username",
+			"value": "user"
+		},
+		{
+			"key": "password",
+			"value": "user"
+		}
+	]
+}

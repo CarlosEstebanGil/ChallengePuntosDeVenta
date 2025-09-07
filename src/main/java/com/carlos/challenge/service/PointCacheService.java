@@ -1,17 +1,17 @@
 package com.carlos.challenge.service;
 
-import com.carlos.challenge.model.PuntoVenta;
-
+import com.carlos.challenge.model.PointOfSale;
 import java.util.List;
+import java.util.Optional;
 
 public interface PointCacheService {
-    List<PuntoVenta> findAll();
-
-    PuntoVenta create(Integer id, String nombre);
-
-    PuntoVenta update(Integer id, String nombre);
-
-    void delete(Integer id);
-
-    PuntoVenta findById(Integer id);
+    List<PointOfSale> findAll();
+    PointOfSale create(String name);
+    PointOfSale create(String name, Integer code);
+    PointOfSale update(String id, String name);
+    void delete(String id);
+    PointOfSale findById(String id);
+    Optional<PointOfSale> findByName(String name);
+    Optional<PointOfSale> findByCode(Integer code);
+    String resolveId(String idOrCode);
 }

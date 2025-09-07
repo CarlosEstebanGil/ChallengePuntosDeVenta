@@ -5,8 +5,21 @@ spring:
   application:
     name: pv-challenge
 
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/pv_challenge_db
+
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
+security:
+  users:
+    - username: admin
+      password: admin
+      roles: ADMIN
+    - username: user
+      password: user
+      roles: USER
