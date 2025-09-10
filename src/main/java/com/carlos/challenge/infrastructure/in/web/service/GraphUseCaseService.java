@@ -16,15 +16,12 @@ import java.util.concurrent.locks.StampedLock;
 @Transactional
 public class GraphUseCaseService implements GraphUseCasePort {
 
-    // ---- Messages (english) --------------------------------------------------
     private static final String ERR_REFLEXIVE_EDGE = "Reflexive edge is not allowed";
     private static final String ERR_COST_NEGATIVE  = "The cost must be >= 0";
     private static final String ERR_NO_MIN_PATH    = "There is no minimum path between the points";
 
     private final PointOfSaleUseCasePort points;
 
-    // Undirected graph: adjacency with symmetric updates.
-    // We keep it in-memory (like legacy), guarded by StampedLock.
     private final ConcurrentMap<String, ConcurrentMap<String, Integer>> adj = new ConcurrentHashMap<>();
     private final StampedLock lock = new StampedLock();
 
@@ -41,7 +38,6 @@ public class GraphUseCaseService implements GraphUseCasePort {
             throw new IllegalArgumentException(ERR_REFLEXIVE_EDGE);
         }
 
-        // Validate both endpoints exist (will throw if not)
         points.findById(fromId);
         points.findById(toId);
 
@@ -56,7 +52,6 @@ public class GraphUseCaseService implements GraphUseCasePort {
 
     @Override
     public void removeEdge(String fromId, String toId) {
-        // Validate exists (keep same semantics as legacy)
         points.findById(fromId);
         points.findById(toId);
 
@@ -71,10 +66,8 @@ public class GraphUseCaseService implements GraphUseCasePort {
 
     @Override
     public List<Neighbor> neighborsOf(String id) {
-        // Validate node exists
         points.findById(id);
 
-        // Optimistic read + fallback
         long stamp = lock.tryOptimisticRead();
         Map<String, Integer> snap = adj.getOrDefault(id, new ConcurrentHashMap<>());
         Map<String, Integer> copy = new HashMap<>(snap);

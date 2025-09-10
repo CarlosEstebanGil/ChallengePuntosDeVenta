@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.UUID;
@@ -29,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import org.springframework.boot.test.mock.mockito.MockBean;
 @WebMvcTest(controllers = CostController.class)
 @ActiveProfiles(TestProfiles.TEST)
 @Import({TestSecurityConfig.class, CostControllerWebTest.MockConfig.class})
@@ -45,8 +44,8 @@ class CostControllerWebTest {
 
     @Autowired MockMvc mvc;
 
-    @MockitoBean GraphUseCasePort graph;
-    @MockitoBean PointOfSaleUseCasePort posUseCase;
+    @MockBean GraphUseCasePort graph;
+    @MockBean PointOfSaleUseCasePort posUseCase;
 
     static final UUID UUID_A = UUID.fromString("11111111-1111-1111-1111-111111111111");
     static final UUID UUID_B = UUID.fromString("22222222-2222-2222-2222-222222222222");

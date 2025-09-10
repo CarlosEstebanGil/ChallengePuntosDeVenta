@@ -3,7 +3,6 @@ package com.carlos.challenge.infrastructure.out.persistence.cache.adapter;
 import com.carlos.challenge.domain.model.PointOfSale;
 import com.carlos.challenge.domain.port.out.PointOfSaleRepositoryPort;
 import org.springframework.stereotype.Component;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;

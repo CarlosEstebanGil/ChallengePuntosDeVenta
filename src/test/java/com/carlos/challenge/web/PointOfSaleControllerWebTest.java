@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
@@ -26,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(controllers = PointOfSaleController.class)
 @ActiveProfiles(TestProfiles.TEST)
@@ -34,11 +34,12 @@ class PointOfSaleControllerWebTest {
 
     @Autowired MockMvc mvc;
 
-    @MockitoBean
+    @MockBean
     PointOfSaleUseCasePort usecase;
 
-    @MockitoBean
+    @MockBean
     PointOfSaleWebMapper mapper;
+
 
     @Test
     @WithMockUser(roles = {"USER"})

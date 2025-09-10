@@ -5,7 +5,6 @@ import com.carlos.challenge.infrastructure.in.web.advice.ApiExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-
 import jakarta.servlet.http.HttpServletRequest;
 
 import static org.assertj.core.api.Assertions.*;
