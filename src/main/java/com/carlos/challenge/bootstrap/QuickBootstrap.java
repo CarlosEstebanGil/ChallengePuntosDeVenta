@@ -1,8 +1,9 @@
 package com.carlos.challenge.bootstrap;
 
-import com.carlos.challenge.model.PointOfSale;
-import com.carlos.challenge.service.GraphService;
-import com.carlos.challenge.service.PointCacheService;
+import com.carlos.challenge.domain.model.PointOfSale;
+import com.carlos.challenge.domain.port.in.PointOfSaleUseCasePort;
+import com.carlos.challenge.domain.port.in.GraphUseCasePort;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +28,12 @@ public class QuickBootstrap implements ApplicationRunner {
             "<== Quick bootstrap: {} Points of Sale and {} initial edges loaded";
     private static final String FAILED_TO_CREATE_EDGE_COST =
             "Failed to create edge {}-{} (cost {}): {}";
+    public static final String COULD_NOT_CREATE_NOR_FIND_EXISTING_POS = "Could not create nor find existing POS '{}': {}";
+    public static final String POS_AT_INDEX = "POS at index ";
+    public static final String WAS_NOT_CREATED = " was not created";
 
-    private final PointCacheService pointCacheService;
-    private final GraphService graphService;
+    private final @NonNull PointOfSaleUseCasePort pointUseCase;
+    private final @NonNull GraphUseCasePort graphUseCase;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -54,14 +58,14 @@ public class QuickBootstrap implements ApplicationRunner {
             String name = names.get(i);
             int code = i + 1;
             try {
-                PointOfSale pos = pointCacheService.create(name, code);
+                PointOfSale pos = pointUseCase.create(name, code);
                 created.add(pos);
             } catch (Exception e) {
-                Optional<PointOfSale> existing = pointCacheService.findByName(name);
+                Optional<PointOfSale> existing = pointUseCase.findByName(name);
                 if (existing.isPresent()) {
                     created.add(existing.get());
                 } else {
-                    log.warn("Could not create nor find existing POS '{}': {}", name, e.getMessage());
+                    log.warn(COULD_NOT_CREATE_NOR_FIND_EXISTING_POS, name, e.getMessage());
                     created.add(null);
                 }
             }
@@ -71,7 +75,7 @@ public class QuickBootstrap implements ApplicationRunner {
             int idx0 = idx1 - 1;
             PointOfSale pos = created.get(idx0);
             if (pos == null) {
-                throw new IllegalStateException("POS at index " + idx1 + " was not created");
+                throw new IllegalStateException(POS_AT_INDEX + idx1 + WAS_NOT_CREATED);
             }
             return pos.id();
         };
@@ -101,7 +105,7 @@ public class QuickBootstrap implements ApplicationRunner {
             try {
                 String fromId = idOf.apply(fromCode);
                 String toId = idOf.apply(toCode);
-                graphService.upsertEdge(fromId, toId, cost);
+                graphUseCase.upsertEdge(fromId, toId, cost);
                 ok++;
             } catch (Exception ex) {
                 log.warn(FAILED_TO_CREATE_EDGE_COST, fromCode, toCode, cost, ex.getMessage());

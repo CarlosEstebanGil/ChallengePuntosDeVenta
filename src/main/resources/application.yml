@@ -8,7 +8,7 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/pv_challenge_db
-
+      auto-index-creation: true
 management:
   endpoints:
     web:
