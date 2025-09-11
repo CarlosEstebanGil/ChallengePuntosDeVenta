@@ -2,12 +2,14 @@ package com.carlos.challenge.infrastructure.out.persistence.cache.adapter;
 
 import com.carlos.challenge.domain.model.PointOfSale;
 import com.carlos.challenge.domain.port.out.PointOfSaleRepositoryPort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.StampedLock;
 
+@Profile("!redis")
 @Component
 public class PointOfSaleCacheAdapter implements PointOfSaleRepositoryPort {
 
