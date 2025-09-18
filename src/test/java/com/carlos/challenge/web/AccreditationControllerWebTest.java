@@ -1,7 +1,5 @@
 package com.carlos.challenge.web;
 
-import com.carlos.challenge.config.TestProfiles;
-import com.carlos.challenge.config.TestSecurityConfig;
 import com.carlos.challenge.domain.model.Accreditation;
 import com.carlos.challenge.domain.port.in.AccreditationUseCasePort;
 import com.carlos.challenge.infrastructure.in.web.controller.AccreditationController;
@@ -16,23 +14,29 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
-
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
 @WebMvcTest(controllers = AccreditationController.class)
-@ActiveProfiles(TestProfiles.TEST)
-@Import({TestSecurityConfig.class, AccreditationControllerWebTest.MockConfig.class})
+@Import({ JwtTestConfig.class })
+@ActiveProfiles("test")
 class AccreditationControllerWebTest {
+
+    @TestConfiguration
+    @EnableMethodSecurity
+    static class MethodSecurityTestConfig {
+    }
 
     @TestConfiguration
     static class MockConfig {
@@ -55,13 +59,17 @@ class AccreditationControllerWebTest {
     @WithMockUser(roles = {"ADMIN"})
     void create_requiresAdmin_andValidates() throws Exception {
         String bodyJson = "{\"amount\":10.00,\"pointOfSaleId\":\"POS1\"}";
-        Accreditation created = new Accreditation("A1", new BigDecimal("10.00"), "POS1", "Point 1", Instant.parse("2024-01-01T00:00:00Z"));
-        AccreditationResponse response = new AccreditationResponse("A1", new BigDecimal("10.00"), "POS1", "Point 1", Instant.parse("2024-01-01T00:00:00Z"));
+
+        Accreditation created = new Accreditation("A1", new BigDecimal("10.00"), "POS1", "Point 1",
+                Instant.parse("2024-01-01T00:00:00Z"));
+        AccreditationResponse response = new AccreditationResponse("A1", new BigDecimal("10.00"),
+                "POS1", "Point 1", Instant.parse("2024-01-01T00:00:00Z"));
 
         when(usecase.create(any(), any())).thenReturn(created);
         when(accreditationWebMapper.toResponse(any(Accreditation.class))).thenReturn(response);
 
         mvc.perform(post("/api/accreditations")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(bodyJson))
                 .andExpect(status().isCreated())
@@ -69,16 +77,21 @@ class AccreditationControllerWebTest {
                 .andExpect(jsonPath("$.id").value("A1"))
                 .andExpect(jsonPath("$.pointOfSaleId").value("POS1"))
                 .andExpect(jsonPath("$.amount").value(10.00));
+
     }
 
     @Test
     @WithMockUser(roles = {"USER"})
     void create_forbiddenForUser() throws Exception {
         String bodyJson = "{\"amount\":10.00,\"pointOfSaleId\":\"POS1\"}";
+
         mvc.perform(post("/api/accreditations")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(bodyJson))
                 .andExpect(status().isForbidden());
+
+        verifyNoInteractions(usecase);
     }
 
     @Test

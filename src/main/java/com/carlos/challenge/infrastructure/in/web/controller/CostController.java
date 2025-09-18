@@ -15,8 +15,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
@@ -45,55 +43,44 @@ public class CostController {
 
     @Operation(
             summary = "Upsert edge (UUID only)",
-            description = "Body must contain UUIDs for 'from' and 'to'.",
-            security = @SecurityRequirement(name = "basicAuth")
+            description = "Body must contain UUIDs for 'from' and 'to'."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Edge created or updated"),
-            @ApiResponse(responseCode = "400", description = "Validation error", content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    examples = @ExampleObject(value = "{\"code\":\"BAD_REQUEST\",\"message\":\"Validation failed\"}")
-            )),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
-    })
+    @ApiResponse(responseCode = "204", description = "Edge created or updated")
+    @ApiResponse(responseCode = "400", description = "Validation error", content = @Content(
+            mediaType = MediaType.APPLICATION_JSON_VALUE,
+            examples = @ExampleObject(value = "{\"code\":\"BAD_REQUEST\",\"message\":\"Validation failed\"}")
+    ))
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "403", description = "Forbidden")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> upsert(
-            @Valid @org.springframework.web.bind.annotation.RequestBody EdgeRequest request) {
+    public ResponseEntity<Void> upsert(@Valid @RequestBody EdgeRequest request) {
         graph.upsertEdge(request.from().toString(), request.to().toString(), request.cost());
         return ResponseEntity.noContent().build();
     }
 
     @Operation(
             summary = "Delete edge (UUID only)",
-            description = "Body must contain UUIDs for 'from' and 'to'.",
-            security = @SecurityRequirement(name = "basicAuth")
+            description = "Body must contain UUIDs for 'from' and 'to'."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Edge deleted"),
-            @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
-    })
+    @ApiResponse(responseCode = "204", description = "Edge deleted")
+    @ApiResponse(responseCode = "400", description = "Validation error")
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "403", description = "Forbidden")
     @DeleteMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(
-            @Valid @org.springframework.web.bind.annotation.RequestBody EdgeDeleteRequest request) {
+    public ResponseEntity<Void> delete(@Valid @RequestBody EdgeDeleteRequest request) {
         graph.removeEdge(request.from().toString(), request.to().toString());
         return ResponseEntity.noContent().build();
     }
 
     @Operation(
             summary = "List neighbors (UUID only)",
-            description = "Path variable must be a UUID. Names and codes are enriched from Points of Sale.",
-            security = @SecurityRequirement(name = "basicAuth")
+            description = "Path variable must be a UUID. Names and codes are enriched from Points of Sale."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Neighbors listed"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
-    })
+    @ApiResponse(responseCode = "200", description = "Neighbors listed")
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "403", description = "Forbidden")
     @GetMapping("/neighbors/{fromId}")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<List<NeighborResponse>> neighbors(
@@ -101,10 +88,8 @@ public class CostController {
             @PathVariable UUID fromId
     ) {
         List<Neighbor> neighbors = graph.neighborsOf(fromId.toString());
-
         List<NeighborResponse> resp = neighbors.stream().map(n -> {
             String name = null;
-            Integer code = null;
             try {
                 PointOfSale pos = posUseCase.findById(n.id());
                 if (pos != null) {
@@ -112,24 +97,19 @@ public class CostController {
                     code = pos.code();
                 }
             } catch (IllegalArgumentException ignore) {
-                // dejamos name/code en null si el POS no existe
             }
             return new NeighborResponse(n.id(), name, n.cost());
         }).toList();
-
         return ResponseEntity.ok(resp);
     }
 
     @Operation(
             summary = "Get all minimum cost paths (UUID only)",
-            description = "Query params must be UUIDs.",
-            security = @SecurityRequirement(name = "basicAuth")
+            description = "Query params must be UUIDs."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Minimum paths computed"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
-    })
+    @ApiResponse(responseCode = "200", description = "Minimum paths computed")
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "403", description = "Forbidden")
     @GetMapping("/min-paths")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<MinPathsResponse> minPaths(
@@ -137,7 +117,6 @@ public class CostController {
             @Parameter(description = "To POS ID (UUID)", required = true) @RequestParam UUID to
     ) {
         MinPaths mp = graph.shortestPaths(from.toString(), to.toString());
-
         List<PathDetail> details = new ArrayList<>(mp.paths().size());
         for (List<String> route : mp.paths()) {
             List<String> names = new ArrayList<>(route.size());
@@ -154,7 +133,6 @@ public class CostController {
             }
             details.add(new PathDetail(route, names, codes));
         }
-
         return ResponseEntity.ok(new MinPathsResponse(mp.totalCost(), details));
     }
 }

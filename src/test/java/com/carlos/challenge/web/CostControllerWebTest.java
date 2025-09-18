@@ -7,7 +7,6 @@ import com.carlos.challenge.domain.model.graph.MinPaths;
 import com.carlos.challenge.domain.model.graph.Neighbor;
 import com.carlos.challenge.domain.port.in.GraphUseCasePort;
 import com.carlos.challenge.domain.port.in.PointOfSaleUseCasePort;
-import com.carlos.challenge.infrastructure.config.SecurityUsersProperties;
 import com.carlos.challenge.infrastructure.in.web.controller.CostController;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,6 +16,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,17 +31,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.boot.test.mock.mockito.MockBean;
 @WebMvcTest(controllers = CostController.class)
 @ActiveProfiles(TestProfiles.TEST)
-@Import({TestSecurityConfig.class, CostControllerWebTest.MockConfig.class})
+@Import({TestSecurityConfig.class, CostControllerWebTest.MockConfig.class,JwtTestConfig.class })
 class CostControllerWebTest {
 
     @TestConfiguration
     static class MockConfig {
         @Bean
-        SecurityUsersProperties securityUsersProperties() {
-            return Mockito.mock(SecurityUsersProperties.class);
+        com.carlos.challenge.infrastructure.config.SecurityUsersProperties securityUsersProperties() {
+            return Mockito.mock(com.carlos.challenge.infrastructure.config.SecurityUsersProperties.class);
+        }
+
+        @Bean
+        PointOfSaleUseCasePort posUseCase() {
+            return Mockito.mock(PointOfSaleUseCasePort.class);
         }
     }
 
+
+    @TestConfiguration
+    @EnableMethodSecurity
+    static class MethodSecurityTestConfig {
+    }
     @Autowired MockMvc mvc;
 
     @MockBean GraphUseCasePort graph;

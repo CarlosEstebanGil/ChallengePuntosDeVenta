@@ -27,3 +27,8 @@ security:
     - username: user
       password: user
       roles: USER
+  jwt:
+
+    issuer: ${SECURITY_JWT_ISSUER:pv-challenge}
+    secret: ${SECURITY_JWT_SECRET:?SECURITY_JWT_SECRET is required}
+    expirySeconds: ${SECURITY_JWT_EXPIRYSECONDS:3600}

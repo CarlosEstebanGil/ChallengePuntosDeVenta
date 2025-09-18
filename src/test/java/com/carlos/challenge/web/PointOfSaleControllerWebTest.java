@@ -19,27 +19,19 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
-
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(controllers = PointOfSaleController.class)
 @ActiveProfiles(TestProfiles.TEST)
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, JwtTestConfig.class, PointOfSaleControllerWebTest.TestPropsConfig.class})
 class PointOfSaleControllerWebTest {
 
     @Autowired MockMvc mvc;
-
-    @MockBean
-    PointOfSaleUseCasePort usecase;
-
-    @MockBean
-    PointOfSaleWebMapper mapper;
-
+    @Autowired PointOfSaleUseCasePort usecase;
+    @Autowired PointOfSaleWebMapper mapper;
 
     @Test
     @WithMockUser(roles = {"USER"})
@@ -80,7 +72,7 @@ class PointOfSaleControllerWebTest {
         PointOfSale pos = new PointOfSale("1", "Alpha", 1001);
         PointOfSaleResponse resp = new PointOfSaleResponse("1", "Alpha", 1001);
 
-        when(usecase.create(eq("Alpha"), eq(1001))).thenReturn(pos);
+        when(usecase.create("Alpha", 1001)).thenReturn(pos);
         when(mapper.toResponse(pos)).thenReturn(resp);
 
         mvc.perform(post("/api/pointsofsale")
@@ -100,7 +92,7 @@ class PointOfSaleControllerWebTest {
         PointOfSale pos = new PointOfSale("1", "Alpha 2", 1001);
         PointOfSaleResponse resp = new PointOfSaleResponse("1", "Alpha 2", 1001);
 
-        when(usecase.update(eq("1"), eq("Alpha 2"))).thenReturn(pos);
+        when(usecase.update("1", "Alpha 2")).thenReturn(pos);
         when(mapper.toResponse(pos)).thenReturn(resp);
 
         mvc.perform(put("/api/pointsofsale/1")
@@ -126,6 +118,16 @@ class PointOfSaleControllerWebTest {
         @Bean
         public SecurityUsersProperties securityUsersProperties() {
             return new SecurityUsersProperties();
+        }
+
+        @Bean
+        public PointOfSaleUseCasePort usecase() {
+            return org.mockito.Mockito.mock(PointOfSaleUseCasePort.class);
+        }
+
+        @Bean
+        public PointOfSaleWebMapper mapper() {
+            return org.mockito.Mockito.mock(PointOfSaleWebMapper.class);
         }
     }
 }

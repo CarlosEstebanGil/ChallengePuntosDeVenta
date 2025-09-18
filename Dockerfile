@@ -18,8 +18,5 @@ COPY --from=build /app/target/*.jar /app/app.jar
 # Puerto por defecto
 EXPOSE 8080
 
-# Env para que Spring apunte al contenedor mongo
-ENV SPRING_DATA_MONGODB_URI="mongodb://mongo:27017/pvdb"
-
 # Levanto la app
 ENTRYPOINT ["java","-jar","/app/app.jar"]

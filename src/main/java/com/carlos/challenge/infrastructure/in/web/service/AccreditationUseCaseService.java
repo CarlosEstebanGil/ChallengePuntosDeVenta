@@ -31,7 +31,6 @@ public class AccreditationUseCaseService implements AccreditationUseCasePort {
         return repository.save(acc);
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public Accreditation findById(String id) {

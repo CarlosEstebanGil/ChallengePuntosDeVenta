@@ -1,6 +1,5 @@
 package com.carlos.challenge.infrastructure.in.web.service;
 
-
 import com.carlos.challenge.domain.model.graph.MinPaths;
 import com.carlos.challenge.domain.model.graph.Neighbor;
 import com.carlos.challenge.domain.port.in.GraphUseCasePort;
@@ -94,7 +93,6 @@ public class GraphUseCaseService implements GraphUseCasePort {
 
     @Override
     public MinPaths shortestPaths(String fromId, String toId) {
-
         points.findById(fromId);
         points.findById(toId);
 
@@ -104,6 +102,27 @@ public class GraphUseCaseService implements GraphUseCasePort {
 
         Map<String, Map<String, Integer>> graph = deepSnapshot(adj);
 
+        DijkstraResult dijkstra = runDijkstra(graph, fromId, toId);
+
+        if (dijkstra.best == Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(ERR_NO_MIN_PATH);
+        }
+
+        List<List<String>> allPaths = buildAllPaths(fromId, toId, dijkstra.preds);
+
+        return new MinPaths(dijkstra.best, allPaths);
+    }
+
+    private static class DijkstraResult {
+        final int best;
+        final Map<String, Set<String>> preds;
+        DijkstraResult(int best, Map<String, Set<String>> preds) {
+            this.best = best;
+            this.preds = preds;
+        }
+    }
+
+    private DijkstraResult runDijkstra(Map<String, Map<String, Integer>> graph, String fromId, String toId) {
         Map<String, Integer> dist = new HashMap<>();
         Map<String, Set<String>> preds = new HashMap<>();
         Set<String> visited = new HashSet<>();
@@ -117,40 +136,53 @@ public class GraphUseCaseService implements GraphUseCasePort {
             String u = pq.poll();
             if (!visited.add(u)) continue;
             if (u.equals(toId)) break;
+            processNeighbors(graph, dist, preds, pq, u);
+        }
+        return new DijkstraResult(dist.getOrDefault(toId, Integer.MAX_VALUE), preds);
+    }
 
-            for (var e : graph.getOrDefault(u, Map.of()).entrySet()) {
-                String v = e.getKey();
-                int w = e.getValue();
-                if (w < 0) continue;
+    private void processNeighbors(
+            Map<String, Map<String, Integer>> graph,
+            Map<String, Integer> dist,
+            Map<String, Set<String>> preds,
+            PriorityQueue<String> pq,
+            String u) {
 
-                int du = dist.getOrDefault(u, Integer.MAX_VALUE);
-                if (du == Integer.MAX_VALUE) continue;
+        int du = dist.getOrDefault(u, Integer.MAX_VALUE);
+        if (du == Integer.MAX_VALUE) {
+            return;
+        }
 
-                int alt = du + w;
-                int dv  = dist.getOrDefault(v, Integer.MAX_VALUE);
+        for (var e : graph.getOrDefault(u, Map.of()).entrySet()) {
+            String v = e.getKey();
+            int w = e.getValue();
+            if (w < 0) {
+                continue;
+            }
 
-                if (alt < dv) {
-                    dist.put(v, alt);
-                    preds.put(v, new HashSet<>(List.of(u)));
-                    pq.add(v);
-                } else if (alt == dv) {
-                    preds.computeIfAbsent(v, k -> new HashSet<>()).add(u);
-                }
+            int alt = du + w;
+            int dv  = dist.getOrDefault(v, Integer.MAX_VALUE);
+
+            if (alt < dv) {
+                dist.put(v, alt);
+                preds.put(v, new HashSet<>(List.of(u)));
+                pq.add(v);
+            } else if (alt == dv) {
+                preds.computeIfAbsent(v, k -> new HashSet<>()).add(u);
             }
         }
+    }
 
-        int best = dist.getOrDefault(toId, Integer.MAX_VALUE);
-        if (best == Integer.MAX_VALUE) {
-            throw new IllegalArgumentException(ERR_NO_MIN_PATH);
-        }
 
+
+    private List<List<String>> buildAllPaths(String fromId, String toId, Map<String, Set<String>> preds) {
         List<List<String>> allPaths = new ArrayList<>();
         Deque<String> stack = new ArrayDeque<>();
         stack.push(toId);
         backtrackPaths(fromId, toId, preds, stack, allPaths);
-
-        return new MinPaths(best, allPaths);
+        return allPaths;
     }
+
 
     private static void backtrackPaths(String start, String current,
                                        Map<String, Set<String>> preds,
