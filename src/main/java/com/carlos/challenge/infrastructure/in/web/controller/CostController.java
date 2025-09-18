@@ -90,6 +90,7 @@ public class CostController {
         List<Neighbor> neighbors = graph.neighborsOf(fromId.toString());
         List<NeighborResponse> resp = neighbors.stream().map(n -> {
             String name = null;
+            Integer code = null;
             try {
                 PointOfSale pos = posUseCase.findById(n.id());
                 if (pos != null) {
