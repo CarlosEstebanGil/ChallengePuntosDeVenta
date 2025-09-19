@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ced3b013-9538-4f1b-86c7-795cafb6c27f",
+		"_postman_id": "b1686d76-2480-476b-8302-4389469be332",
 		"name": "PV Challenge API (Local)",
 		"description": "Colección Postman para Puntos de Venta, Acreditaciones y Grafo.\nIncluye ejemplos de filtros y pruebas de seguridad (Basic).",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -14,16 +14,11 @@
 					"name": "Crear PV (ADMIN)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "password",
-									"value": "admin",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "admin",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJ1c2VyIiwiZXhwIjoxNzU4MjM1NzkyLCJpYXQiOjE3NTgyMzIxOTIsInNjb3BlIjoiUk9MRV9VU0VSIn0.XNBzfDqGcoqGtQ-rYMIWg7J3zwoNHLKrYf4X3YgUU0U",
 									"type": "string"
 								}
 							]
@@ -38,7 +33,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"id\": 11,\n  \"name\": \"Sucursal aislada 11\"\n}"
+							"raw": "{\n  \"name\": \"Sucursal aislada 12\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/pointsofsale",
@@ -47,7 +42,7 @@
 							],
 							"path": [
 								"api",
-								"pos"
+								"pointsofsale"
 							]
 						},
 						"description": "Crea un punto de venta"
@@ -58,16 +53,11 @@
 					"name": "Listar PV (USER/ADMIN)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "user",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "user",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJ1c2VyIiwiZXhwIjoxNzU4MjM1NzkyLCJpYXQiOjE3NTgyMzIxOTIsInNjb3BlIjoiUk9MRV9VU0VSIn0.XNBzfDqGcoqGtQ-rYMIWg7J3zwoNHLKrYf4X3YgUU0U",
 									"type": "string"
 								}
 							]
@@ -87,7 +77,7 @@
 							],
 							"path": [
 								"api",
-								"pos"
+								"pointsofsale"
 							]
 						}
 					},
@@ -97,16 +87,11 @@
 					"name": "Obtener PV por ID (USER/ADMIN)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "user",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "user",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -120,14 +105,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/pointsofsale/1",
+							"raw": "{{baseUrl}}/api/pointsofsale/cbc92ddb-96a7-4540-a48f-2c9b61eecf20",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"pos",
-								"1"
+								"pointsofsale",
+								"cbc92ddb-96a7-4540-a48f-2c9b61eecf20"
 							]
 						}
 					},
@@ -161,17 +146,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Sucursal AISLADA 11 (actualizada)\"\n}"
+							"raw": "{\n  \"name\": \"actualizada\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/pointsofsale/12",
+							"raw": "{{baseUrl}}/api/pointsofsale/cbc92ddb-96a7-4540-a48f-2c9b61eecf20",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"pos",
-								"12"
+								"pointsofsale",
+								"cbc92ddb-96a7-4540-a48f-2c9b61eecf20"
 							]
 						}
 					},
@@ -181,16 +166,11 @@
 					"name": "Eliminar PV (ADMIN)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "admin",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "admin",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -204,14 +184,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/pointsofsale/11",
+							"raw": "{{baseUrl}}/api/pointsofsale/d4c6c1a3-c0e6-4ddf-a67d-33aa983f1475",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"pos",
-								"11"
+								"pointsofsale",
+								"d4c6c1a3-c0e6-4ddf-a67d-33aa983f1475"
 							]
 						}
 					},
@@ -226,16 +206,11 @@
 					"name": "Crear Acreditación (USER/ADMIN)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "user",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "user",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -250,7 +225,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"amount\": 1234.56,\n  \"pointOfSaleId\": 1\n}"
+							"raw": "{\n  \"amount\": 1234.56,\n  \"pointOfSaleId\": \"7d468356-d406-4bec-b6db-e9333c085835\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/accreditations",
@@ -270,16 +245,11 @@
 					"name": "Listar (paginado)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "user",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "user",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -319,16 +289,11 @@
 					"name": "Listar filtrando por PV",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "user",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "user",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -342,7 +307,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/accreditations?pointOfSaleId=1&page=0&size=10",
+							"raw": "{{baseUrl}}/api/accreditations?pointOfSaleId=68cc6a382d259437d2452099&page=0&size=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -353,7 +318,7 @@
 							"query": [
 								{
 									"key": "pointOfSaleId",
-									"value": "1"
+									"value": "68cc6a382d259437d2452099"
 								},
 								{
 									"key": "page",
@@ -372,16 +337,11 @@
 					"name": "Listar filtrando por rango fechas",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "user",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "user",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -395,7 +355,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/accreditations?from=2025-09-01T00:00:00Z&to=2025-09-02T00:00:00Z&page=0&size=10",
+							"raw": "{{baseUrl}}/api/accreditations?from=2025-09-03T00:00:00Z&to=2025-09-04T00:00:00Z&page=0&size=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -406,11 +366,11 @@
 							"query": [
 								{
 									"key": "from",
-									"value": "2025-09-01T00:00:00Z"
+									"value": "2025-09-03T00:00:00Z"
 								},
 								{
 									"key": "to",
-									"value": "2025-09-02T00:00:00Z"
+									"value": "2025-09-04T00:00:00Z"
 								},
 								{
 									"key": "page",
@@ -429,16 +389,11 @@
 					"name": "Eliminar por id",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "password",
-									"value": "admin",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "admin",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -446,14 +401,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/accreditations/68b5d05ee0edbc0a9a498ad3",
+							"raw": "{{baseUrl}}/api/accreditations/68cc6a382d259437d2452099",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"accreditations",
-								"68b5d05ee0edbc0a9a498ad3"
+								"68cc6a382d259437d2452099"
 							]
 						}
 					},
@@ -468,16 +423,11 @@
 					"name": "Upsert arista (USER/ADMIN)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "password",
-									"value": "admin",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "admin",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -492,7 +442,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"fromId\": 2,\n  \"toId\": 10,\n  \"cost\": 6\n}"
+							"raw": "{\n  \"fromId\":  \"cbc92ddb-96a7-4540-a48f-2c9b61eecf20\",\n  \"toId\":   \"5404c47e-6796-4742-8182-5b182a6712b5\",\n  \"cost\":   6\n}\n"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/graph/costs",
@@ -501,6 +451,7 @@
 							],
 							"path": [
 								"api",
+								"graph",
 								"costs"
 							]
 						},
@@ -512,16 +463,11 @@
 					"name": "Eliminar arista (USER/ADMIN)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "user",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "user",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -534,25 +480,24 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fromId\": \"cbc92ddb-96a7-4540-a48f-2c9b61eecf20\",\r\n  \"toId\": \"5404c47e-6796-4742-8182-5b182a6712b5\",\r\n  \"cost\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{baseUrl}}/api/graph/costs/edges?from=1&to=2",
+							"raw": "{{baseUrl}}/api/graph/costs",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"costs",
-								"edges"
-							],
-							"query": [
-								{
-									"key": "from",
-									"value": "1"
-								},
-								{
-									"key": "to",
-									"value": "2"
-								}
+								"graph",
+								"costs"
 							]
 						}
 					},
@@ -562,16 +507,11 @@
 					"name": "Vecinos de un nodo (USER/ADMIN)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "user",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "user",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -585,15 +525,16 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/graph/costs/neighbors/3",
+							"raw": "{{baseUrl}}/api/graph/costs/neighbors/cbd332cb-2f46-45b0-a77f-6552c75c5f14",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
+								"graph",
 								"costs",
 								"neighbors",
-								"3"
+								"cbd332cb-2f46-45b0-a77f-6552c75c5f14"
 							]
 						}
 					},
@@ -603,16 +544,11 @@
 					"name": "Camino mínimo (USER/ADMIN)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "user",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "user",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwdi1jaGFsbGVuZ2UiLCJzdWIiOiJhZG1pbiIsImV4cCI6MTc1ODIzNTg3OCwiaWF0IjoxNzU4MjMyMjc4LCJzY29wZSI6IlJPTEVfQURNSU4ifQ.KlnzkP9QP0KT17n6Pp9OMGJkwoUbSjltWJ6aaAMK6Gg",
 									"type": "string"
 								}
 							]
@@ -626,23 +562,24 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/graph/costs/min-path?from=1&to=7",
+							"raw": "{{baseUrl}}/api/graph/costs/min-paths?from=b1bff137-a252-483a-8721-e82790cc721a&to=cbd332cb-2f46-45b0-a77f-6552c75c5f14",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
+								"graph",
 								"costs",
-								"min-path"
+								"min-paths"
 							],
 							"query": [
 								{
 									"key": "from",
-									"value": "1"
+									"value": "b1bff137-a252-483a-8721-e82790cc721a"
 								},
 								{
 									"key": "to",
-									"value": "7"
+									"value": "cbd332cb-2f46-45b0-a77f-6552c75c5f14"
 								}
 							]
 						}
@@ -722,7 +659,7 @@
 							"raw": "{\n  \"id\": 11,\n  \"name\": \"Sucursal Norte\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/pointsofsale",
+							"raw": "{{baseUrl}}/api/pos",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -735,19 +672,67 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Seguridad / login ( jwt)",
+			"item": [
+				{
+					"name": "get token",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "user",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "user",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin\"\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {
 		"type": "basic",
 		"basic": [
 			{
-				"key": "username",
-				"value": "{{username}}",
+				"key": "password",
+				"value": "admin",
 				"type": "string"
 			},
 			{
-				"key": "password",
-				"value": "{{password}}",
+				"key": "username",
+				"value": "admin",
 				"type": "string"
 			}
 		]
@@ -777,7 +762,7 @@
 	"variable": [
 		{
 			"key": "baseUrl",
-			"value": "http://localhost:8080"
+			"value": "http://192.168.1.34:8080"
 		},
 		{
 			"key": "username",
